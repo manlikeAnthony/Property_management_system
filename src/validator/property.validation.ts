@@ -1,5 +1,4 @@
 import Joi from "joi";
-import { SocketAddress } from "node:net";
 
 export const createPropertySchema = Joi.object({
     title: Joi.string().trim().max(100).required().messages({

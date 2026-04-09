@@ -2,6 +2,7 @@ import { Schema, model, Document, Types } from "mongoose";
 
 export type PropertyStatus = "AVAILABLE" | "SOLD" | "RENTED";
 export type PropertyType = "SALE" | "RENT";
+
 const LocationSchema = new Schema(
   {
     type: {

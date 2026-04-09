@@ -217,7 +217,7 @@ export const updatePropertyService = async (
   return property;
 };
 
-export const getUserRentedPropertiesService = async (userId: string) => {
+export const getMyRentedPropertiesService = async (userId: string) => {
   const properties = await Property.find({ "tenants.userId": userId });
   return properties;
 };

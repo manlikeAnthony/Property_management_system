@@ -6,7 +6,8 @@ import {
   deletePropertyService,
   updatePropertyService,
   getPropertyByIdService,
-  getUserRentedPropertiesService,
+  getMyRentedPropertiesService,
+  getMyListedPropertiesService,
   getAllPropertiesOnSaleService,
   getAllPropertiesForRentService,
   getAllPropertiesByTypeService,
@@ -171,4 +172,33 @@ export const updateProperty = async (req: Request<Params>, res: Response) => {
       code: AppCodes.SUCCESS,
     }),
   );
+};
+
+export const getMyRentedProperties = async (req: Request, res: Response) => {
+  const properties = await getMyRentedPropertiesService(req.user.userId);
+
+  res.status(HttpCodes.OK).json(
+    successResponse({
+      message: "User Rented Properties fetched successfully",
+      data: properties,
+      code: AppCodes.SUCCESS,
+    }),
+  );
+};
+
+export const getMyListedProperties = async (req: Request, res: Response) => {
+  const properties = await getMyListedPropertiesService(req.user.userId);
+
+  res.status(HttpCodes.OK).json(
+    successResponse({
+      message: "User listed properties fetched successfully",
+      data: properties,
+      code: AppCodes.SUCCESS,
+    }),
+  );
+};
+
+export const getAllPropertiesByType = async (req: Request, res: Response) => {
+  const { type } = req.body;
+  
 };

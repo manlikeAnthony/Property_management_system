@@ -1,0 +1,8 @@
+node_modules/
+dist/
+build/
+logs/
+coverage/
+.env
+.env.*
+*.log

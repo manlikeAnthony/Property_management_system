@@ -1,0 +1,624 @@
+{
+  "/src": {
+    "percentage": 36,
+    "totalStatements": 1574,
+    "coveredStatements": 573
+  },
+  "/": {
+    "percentage": 36,
+    "totalStatements": 1574,
+    "coveredStatements": 573
+  },
+  "/src/app.ts": {
+    "percentage": 0,
+    "totalStatements": 27,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/server.ts": {
+    "percentage": 0,
+    "totalStatements": 21,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "startServer",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "startServer",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/config": {
+    "percentage": 55,
+    "totalStatements": 49,
+    "coveredStatements": 27
+  },
+  "/src/config/database.ts": {
+    "percentage": 0,
+    "totalStatements": 16,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "connectDB",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "connectDB",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/config/jwt.ts": {
+    "percentage": 67,
+    "totalStatements": 18,
+    "coveredStatements": 12,
+    "testables": []
+  },
+  "/src/config/nodemailer.ts": {
+    "percentage": 100,
+    "totalStatements": 15,
+    "coveredStatements": 15,
+    "testables": []
+  },
+  "/src/controllers": {
+    "percentage": 40,
+    "totalStatements": 244,
+    "coveredStatements": 97
+  },
+  "/src/controllers/auth.controller.ts": {
+    "percentage": 61,
+    "totalStatements": 159,
+    "coveredStatements": 97,
+    "testables": [
+      {
+        "name": "register",
+        "percentage": 100,
+        "totalStatements": 17,
+        "coveredStatements": 17
+      },
+      {
+        "name": "login",
+        "percentage": 100,
+        "totalStatements": 15,
+        "coveredStatements": 15
+      },
+      {
+        "name": "logout",
+        "percentage": 100,
+        "totalStatements": 18,
+        "coveredStatements": 18
+      },
+      {
+        "name": "verifyEmail",
+        "percentage": 100,
+        "totalStatements": 11,
+        "coveredStatements": 11
+      },
+      {
+        "name": "resendVerificationEmail",
+        "percentage": 0,
+        "totalStatements": 19,
+        "coveredStatements": 0
+      },
+      {
+        "name": "forgotPassword",
+        "percentage": 0,
+        "totalStatements": 26,
+        "coveredStatements": 0
+      },
+      {
+        "name": "resetPassword",
+        "percentage": 0,
+        "totalStatements": 17,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/controllers/user.controller.ts": {
+    "percentage": 0,
+    "totalStatements": 85,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "getAllUsers",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllAdmins",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getCurrentUser",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getSingleUser",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "deleteUser",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/errors": {
+    "percentage": 100,
+    "totalStatements": 135,
+    "coveredStatements": 135
+  },
+  "/src/errors/AppCodes.ts": {
+    "percentage": 100,
+    "totalStatements": 43,
+    "coveredStatements": 43,
+    "testables": []
+  },
+  "/src/errors/CustomError.ts": {
+    "percentage": 100,
+    "totalStatements": 38,
+    "coveredStatements": 38,
+    "testables": [
+      {
+        "name": "CustomError",
+        "percentage": 100,
+        "totalStatements": 13,
+        "coveredStatements": 13
+      },
+      {
+        "name": "throwError",
+        "parentName": "CustomError",
+        "percentage": 100,
+        "totalStatements": 16,
+        "coveredStatements": 16
+      }
+    ]
+  },
+  "/src/errors/HttpCodes.ts": {
+    "percentage": 100,
+    "totalStatements": 54,
+    "coveredStatements": 54,
+    "testables": []
+  },
+  "/src/logger": {
+    "percentage": 80,
+    "totalStatements": 50,
+    "coveredStatements": 40
+  },
+  "/src/logger/CustomLogger.ts": {
+    "percentage": 64,
+    "totalStatements": 28,
+    "coveredStatements": 18,
+    "testables": [
+      {
+        "name": "CustomLogger",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "info",
+        "parentName": "CustomLogger",
+        "percentage": 0,
+        "totalStatements": 10,
+        "coveredStatements": 0
+      },
+      {
+        "name": "error",
+        "parentName": "CustomLogger",
+        "percentage": 100,
+        "totalStatements": 10,
+        "coveredStatements": 10
+      }
+    ]
+  },
+  "/src/logger/logger.ts": {
+    "percentage": 100,
+    "totalStatements": 22,
+    "coveredStatements": 22,
+    "testables": []
+  },
+  "/src/middlewares": {
+    "percentage": 0,
+    "totalStatements": 169,
+    "coveredStatements": 0
+  },
+  "/src/middlewares/async-handler.ts": {
+    "percentage": 0,
+    "totalStatements": 6,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "asyncHandler",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/middlewares/authenticate.ts": {
+    "percentage": 0,
+    "totalStatements": 64,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "authenticateUser",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "authorizeRoles",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/middlewares/error-handler.ts": {
+    "percentage": 0,
+    "totalStatements": 94,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "errorHandlerMiddleware",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/middlewares/not-found.ts": {
+    "percentage": 0,
+    "totalStatements": 5,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "notFound",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/models": {
+    "percentage": 45,
+    "totalStatements": 250,
+    "coveredStatements": 112
+  },
+  "/src/models/ownership.model.ts": {
+    "percentage": 0,
+    "totalStatements": 34,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/models/property.model.ts": {
+    "percentage": 0,
+    "totalStatements": 49,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/models/token.model.ts": {
+    "percentage": 100,
+    "totalStatements": 40,
+    "coveredStatements": 40,
+    "testables": []
+  },
+  "/src/models/transaction.model.ts": {
+    "percentage": 0,
+    "totalStatements": 49,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/models/user.model.ts": {
+    "percentage": 92,
+    "totalStatements": 78,
+    "coveredStatements": 72,
+    "testables": [
+      {
+        "name": "comparePassword",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/response": {
+    "percentage": 69,
+    "totalStatements": 48,
+    "coveredStatements": 33
+  },
+  "/src/response/error.response.ts": {
+    "percentage": 35,
+    "totalStatements": 23,
+    "coveredStatements": 8,
+    "testables": [
+      {
+        "name": "errorResponse",
+        "percentage": 0,
+        "totalStatements": 15,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/response/index.ts": {
+    "percentage": 100,
+    "totalStatements": 2,
+    "coveredStatements": 2,
+    "testables": []
+  },
+  "/src/response/success.response.ts": {
+    "percentage": 100,
+    "totalStatements": 23,
+    "coveredStatements": 23,
+    "testables": []
+  },
+  "/src/routes": {
+    "percentage": 0,
+    "totalStatements": 43,
+    "coveredStatements": 0
+  },
+  "/src/routes/auth.route.ts": {
+    "percentage": 0,
+    "totalStatements": 18,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/routes/user.route.ts": {
+    "percentage": 0,
+    "totalStatements": 25,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/services": {
+    "percentage": 19,
+    "totalStatements": 307,
+    "coveredStatements": 58
+  },
+  "/src/services/auth.service.ts": {
+    "percentage": 23,
+    "totalStatements": 250,
+    "coveredStatements": 58,
+    "testables": [
+      {
+        "name": "registerService",
+        "percentage": 69,
+        "totalStatements": 39,
+        "coveredStatements": 27
+      },
+      {
+        "name": "loginService",
+        "percentage": 0,
+        "totalStatements": 72,
+        "coveredStatements": 0
+      },
+      {
+        "name": "logoutService",
+        "percentage": 100,
+        "totalStatements": 4,
+        "coveredStatements": 4
+      },
+      {
+        "name": "verifyEmailService",
+        "percentage": 0,
+        "totalStatements": 39,
+        "coveredStatements": 0
+      },
+      {
+        "name": "resendVerificationEmailService",
+        "percentage": 0,
+        "totalStatements": 26,
+        "coveredStatements": 0
+      },
+      {
+        "name": "forgotPasswordService",
+        "percentage": 0,
+        "totalStatements": 20,
+        "coveredStatements": 0
+      },
+      {
+        "name": "resetPasswordService",
+        "percentage": 0,
+        "totalStatements": 23,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/services/user.service.ts": {
+    "percentage": 0,
+    "totalStatements": 57,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "getAllUsersService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllAdminsService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getCurrentUserService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getSingleUserService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/types": {
+    "percentage": 0,
+    "totalStatements": 48,
+    "coveredStatements": 0
+  },
+  "/src/types/auth.types.ts": {
+    "percentage": 0,
+    "totalStatements": 17,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/types/email.ts": {
+    "percentage": 0,
+    "totalStatements": 15,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/types/token.ts": {
+    "percentage": 0,
+    "totalStatements": 16,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/utils": {
+    "percentage": 39,
+    "totalStatements": 183,
+    "coveredStatements": 71
+  },
+  "/src/utils/checkPermission.ts": {
+    "percentage": 27,
+    "totalStatements": 26,
+    "coveredStatements": 7,
+    "testables": [
+      {
+        "name": "checkPermissions",
+        "percentage": 0,
+        "totalStatements": 19,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/utils/cookies.ts": {
+    "percentage": 39,
+    "totalStatements": 36,
+    "coveredStatements": 14,
+    "testables": [
+      {
+        "name": "attachCookiesToResponse",
+        "percentage": 0,
+        "totalStatements": 22,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/utils/create-token-user.ts": {
+    "percentage": 45,
+    "totalStatements": 11,
+    "coveredStatements": 5,
+    "testables": [
+      {
+        "name": "createTokenUser",
+        "percentage": 0,
+        "totalStatements": 6,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/utils/index.ts": {
+    "percentage": 100,
+    "totalStatements": 4,
+    "coveredStatements": 4,
+    "testables": []
+  },
+  "/src/utils/jwt.ts": {
+    "percentage": 46,
+    "totalStatements": 28,
+    "coveredStatements": 13,
+    "testables": [
+      {
+        "name": "createAccessToken",
+        "percentage": 0,
+        "totalStatements": 5,
+        "coveredStatements": 0
+      },
+      {
+        "name": "createRefreshToken",
+        "percentage": 0,
+        "totalStatements": 8,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/utils/email": {
+    "percentage": 36,
+    "totalStatements": 78,
+    "coveredStatements": 28
+  },
+  "/src/utils/email/index.ts": {
+    "percentage": 100,
+    "totalStatements": 3,
+    "coveredStatements": 3,
+    "testables": []
+  },
+  "/src/utils/email/sendEmail.ts": {
+    "percentage": 50,
+    "totalStatements": 22,
+    "coveredStatements": 11,
+    "testables": [
+      {
+        "name": "sendEmail",
+        "percentage": 0,
+        "totalStatements": 11,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/utils/email/sendResetPasswordEmail.ts": {
+    "percentage": 23,
+    "totalStatements": 26,
+    "coveredStatements": 6,
+    "testables": [
+      {
+        "name": "sendResetPasswordEmail",
+        "percentage": 0,
+        "totalStatements": 20,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/utils/email/sendVerificationEmail.ts": {
+    "percentage": 17,
+    "totalStatements": 23,
+    "coveredStatements": 4,
+    "testables": [
+      {
+        "name": "sendVerificationEmail",
+        "percentage": 0,
+        "totalStatements": 19,
+        "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/utils/email/transporter.ts": {
+    "percentage": 100,
+    "totalStatements": 4,
+    "coveredStatements": 4,
+    "testables": []
+  }
+}

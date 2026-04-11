@@ -26,6 +26,7 @@ export const getAllUsers = async (_req: Request, res: Response) => {
 };
 
 export const getAllAdmins = async (_req: Request, res: Response) => {
+  
   const admins = await getAllAdminsService();
 
   res.status(200).json(

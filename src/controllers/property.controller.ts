@@ -8,8 +8,6 @@ import {
   getPropertyByIdService,
   getMyRentedPropertiesService,
   getMyListedPropertiesService,
-  getAllPropertiesOnSaleService,
-  getAllPropertiesForRentService,
   getAllPropertiesByTypeService,
   getAllPropertiesByLocationService,
 } from "../services/property.service";
@@ -18,6 +16,16 @@ import { HttpCodes } from "../errors/HttpCodes";
 import { AppCodes } from "../errors/AppCodes";
 import { CustomError } from "../errors/CustomError";
 import { S3StorageService } from "../services/s3.service";
+import { parsePropertyQuery } from "../query/property/propertyQuery";
+import {
+  CreatePropertyDTO,
+  UpdatePropertyDTO,
+  CreatePropertyWithImagesDTO,
+} from "../dto/property";
+import {
+  mapToCreatePropertyDTO,
+  mapToUpdatePropertyDTO,
+} from "../utils/mappers/property.mapper";
 
 export const createProperty = async (req: Request, res: Response) => {
   const user = req.user;
@@ -54,14 +62,14 @@ export const createProperty = async (req: Request, res: Response) => {
       throw err;
     }
   }
+  const dto: CreatePropertyDTO = mapToCreatePropertyDTO(req.body);
 
-  const property = await createPropertyService(
-    {
-      ...req.body,
-      images: uploadedImages,
-    },
-    user,
-  );
+  const data: CreatePropertyWithImagesDTO = {
+    ...dto,
+    images: uploadedImages,
+  };
+
+  const property = await createPropertyService(data, user);
 
   res.status(HttpCodes.CREATED).json(
     successResponse({
@@ -72,8 +80,10 @@ export const createProperty = async (req: Request, res: Response) => {
   );
 };
 
-export const getAllProperties = async (_req: Request, res: Response) => {
-  const properties = await getAllPropertiesService();
+export const getAllProperties = async (req: Request, res: Response) => {
+  const query = parsePropertyQuery(req);
+
+  const properties = await getAllPropertiesService(query);
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Properties retrieved successfully",
@@ -158,9 +168,13 @@ export const updateProperty = async (req: Request<Params>, res: Response) => {
     }
   }
 
+  const dto: UpdatePropertyDTO = mapToUpdatePropertyDTO(req.body);
+
+  dto.imagesToRemove = imagesToRemove;
+
   const updatedProperty = await updatePropertyService(
     propertyId,
-    { ...req.body, imagesToRemove },
+    dto,
     user,
     files,
   );
@@ -199,6 +213,47 @@ export const getMyListedProperties = async (req: Request, res: Response) => {
 };
 
 export const getAllPropertiesByType = async (req: Request, res: Response) => {
-  const { type } = req.body;
-  
+  const query = parsePropertyQuery(req);
+
+  if (!query.filters.type) {
+    CustomError.throwError(
+      HttpCodes.BAD_REQUEST,
+      AppCodes.INVALID_INPUT,
+      "type query parameter is required ",
+    );
+  }
+
+  const properties = await getAllPropertiesByTypeService(query);
+  res.status(HttpCodes.OK).json(
+    successResponse({
+      message: "Properties fetched successfully",
+      data: properties,
+      code: AppCodes.SUCCESS,
+    }),
+  );
+};
+
+export const getAllPropertiesByLocation = async (
+  req: Request,
+  res: Response,
+) => {
+  const query = parsePropertyQuery(req);
+
+  if (!query.filters.city && !query.filters.state && !query.filters.country) {
+    CustomError.throwError(
+      HttpCodes.BAD_REQUEST,
+      AppCodes.INVALID_INPUT,
+      "At least one of city, state or country query parameters is required",
+    );
+  }
+
+  const properties = await getAllPropertiesByLocationService(query);
+
+  res.status(HttpCodes.OK).json(
+    successResponse({
+      message: "Properties fetched successfully",
+      data: properties,
+      code: AppCodes.SUCCESS,
+    }),
+  );
 };

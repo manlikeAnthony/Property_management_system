@@ -4,7 +4,17 @@ import { HttpCodes } from "../errors/HttpCodes";
 import { AppCodes } from "../errors/AppCodes";
 import User from "../models/user.model";
 import { S3StorageService } from "./s3.service";
-export const createPropertyService = async (data: any, user: any) => {
+import type { PropertyType } from "../models/property.model";
+import {
+  UpdatePropertyDTO,
+  CreatePropertyWithImagesDTO,
+} from "../dto/property";
+import { PropertyQuery } from "../query/property/propertyQuery";
+
+export const createPropertyService = async (
+  data: CreatePropertyWithImagesDTO,
+  user: any,
+) => {
   const userRecord = await User.findById(user.userId).populate(
     "landlordProfile",
   );
@@ -60,20 +70,6 @@ export const createPropertyService = async (data: any, user: any) => {
     images,
   } = data;
 
-  if (
-    !title ||
-    !price ||
-    !type ||
-    !address?.street ||
-    !address?.city ||
-    !address?.state
-  ) {
-    CustomError.throwError(
-      HttpCodes.BAD_REQUEST,
-      AppCodes.MISSING_REQUIRED_FIELD,
-      "Missing required property fields",
-    );
-  }
   const formattedAddress = [address?.street, address?.city, address?.state]
     .filter(Boolean)
     .join(", ");
@@ -98,8 +94,56 @@ export const createPropertyService = async (data: any, user: any) => {
   return property;
 };
 
-export const getAllPropertiesService = async () => {
-  const properties = await Property.find();
+export const getAllPropertiesService = async (query: PropertyQuery) => {
+  const { filters , pagination } = query;
+  const mongoQuery: any = {};
+
+  if (filters.type) {
+    mongoQuery.type = filters.type;
+  }
+  if(filters.city) {
+    mongoQuery["address.city"] = {
+      $regex: filters.city,
+      $options: "i",
+    };
+  }
+  if(filters.state) {
+    mongoQuery["address.state"] = {
+      $regex: filters.state,
+      $options: "i",
+    };
+  }
+  if(filters.country) {
+    mongoQuery["address.country"] = {
+      $regex: filters.country,
+      $options: "i",
+    };
+  }
+
+  if(filters.minPrice || filters.maxPrice){
+    mongoQuery.price = {};
+    if(filters.minPrice !== undefined){
+      mongoQuery.price.$gte = filters.minPrice
+    }
+    if(filters.maxPrice !== undefined){
+      mongoQuery.price.$lte = filters.maxPrice 
+    }
+  }
+  if(filters.search){
+    mongoQuery.$or = [
+      {
+        title : {$regex : filters.search , $options : "i"}
+      },
+      {
+        description : {$regex : filters.search , $options : "i"}
+      }
+    ]
+  }
+  const properties = await Property.find(mongoQuery)
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ createdAt: -1 });
+
   return properties;
 };
 
@@ -138,8 +182,7 @@ export const deletePropertyService = async (propertyId: string, user: any) => {
 
   if (property.images && property.images.length > 0) {
     await Promise.all(
-     property.images.map((image)=> storageService.delete(image.url)
-      ),
+      property.images.map((image) => storageService.delete(image.url)),
     );
   }
   await property.deleteOne();
@@ -148,7 +191,7 @@ export const deletePropertyService = async (propertyId: string, user: any) => {
 
 export const updatePropertyService = async (
   propertyId: string,
-  data: any,
+  data: UpdatePropertyDTO,
   user: any,
   files?: Express.Multer.File[],
 ) => {
@@ -160,6 +203,7 @@ export const updatePropertyService = async (
       "Property not found",
     );
   }
+
   if (
     property.owner.toString() !== user.userId &&
     !user.roles.includes("ADMIN")
@@ -170,11 +214,14 @@ export const updatePropertyService = async (
       "Not authorized to update this property",
     );
   }
+
+  const imagesToRemove = data.imagesToRemove || [];
+
   const storageService = new S3StorageService();
   // remove images if requested
-  if (data.imagesToRemove?.length) {
+  if (imagesToRemove?.length) {
     await Promise.all(
-      data.imagesToRemove.map((key: string) =>
+      imagesToRemove.map((key: string) =>
         storageService.delete(
           `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
         ),
@@ -182,36 +229,36 @@ export const updatePropertyService = async (
     );
 
     property.images = property.images.filter(
-      (image)=> !data.imagesToRemove.includes(image.key)
-    )
+      (image) => !imagesToRemove.includes(image.key),
+    );
   }
 
   // add new images if provided
 
-  if(files && files.length > 0){
+  if (files && files.length > 0) {
     const uploaded = await Promise.all(
-      files.map((file)=> storageService.upload(file, "properties"))
-    )
-    property.images.push(...uploaded)
+      files.map((file) => storageService.upload(file, "properties")),
+    );
+    property.images.push(...uploaded);
   }
+
   delete data.imagesToRemove; // remove this field from data so it doesn't get set on the property
-  const allowedFields = [
-    "title",
-    "description",
-    "price",
-    "type",
-    "address",
-    "bedrooms",
-    "bathrooms",
-    "area"
-  ];
 
-  allowedFields.forEach((field)=>{
-    if(data[field] !== undefined){
-      (property as any)[field] = data[field];
-    }
-  })
+  if (data.title !== undefined) property.title = data.title;
+  if (data.description !== undefined) property.description = data.description;
+  if (data.price !== undefined) property.price = data.price;
+  if (data.type !== undefined) property.type = data.type;
 
+  if (data.bedrooms !== undefined) property.bedrooms = data.bedrooms;
+  if (data.bathrooms !== undefined) property.bathrooms = data.bathrooms;
+  if (data.area !== undefined) property.area = data.area;
+
+  if (data.address) {
+    property.address = {
+      ...property.address,
+      ...data.address,
+    };
+  }
   await property.save();
 
   return property;
@@ -227,27 +274,51 @@ export const getMyListedPropertiesService = async (userId: string) => {
   return properties;
 };
 
-export const getAllPropertiesOnSaleService = async () => {
-  // pointless btw, we can just use getAllPropertiesByType with type = SALE
-  const properties = await Property.find({ isPublished: true, type: "SALE" });
-  return properties;
-};
+export const getAllPropertiesByTypeService = async (query: PropertyQuery) => {
+  const { filters, pagination } = query;
 
-export const getAllPropertiesForRentService = async () => {
-  // pointless btw, we can just use getAllPropertiesByType with type = RENT, still left it tho because it might be useful for future features like filtering by sale/rent
-  const properties = await Property.find({ isPublished: true, type: "RENT" });
-  return properties;
-};
-
-export const getAllPropertiesByTypeService = async (type: string) => {
-  const properties = await Property.find({ isPublished: true, type });
-  return properties;
-};
-
-export const getAllPropertiesByLocationService = async (location: string) => {
   const properties = await Property.find({
     isPublished: true,
-    "location.city": location,
-  });
+    type: filters.type,
+  })
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ createdAt: -1 });
+
+  return properties;
+};
+
+export const getAllPropertiesByLocationService = async (
+  query: PropertyQuery,
+) => {
+  const { filters, pagination } = query;
+  const mongoQuery: any = {
+    isPublished: true,
+  };
+  if (filters.city) {
+    mongoQuery["address.city"] = {
+      $regex: filters.city,
+      $options: "i",
+    };
+  }
+
+  if (filters.state) {
+    mongoQuery["address.state"] = {
+      $regex: filters.state,
+      $options: "i",
+    };
+  }
+
+  if (filters.country) {
+    mongoQuery["address.country"] = {
+      $regex: filters.country,
+      $options: "i",
+    };
+  }
+
+  const properties = await Property.find(mongoQuery)
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ createdAt: -1 });
   return properties;
 };

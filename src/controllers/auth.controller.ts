@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 import crypto from "crypto";
-
 import User from "../models/user.model";
 import Token, { TokenDocument } from "../models/token.model";
 import { attachCookiesToResponse, createTokenUser } from "../utils";
-
 import { CustomError } from "../errors/CustomError";
 import { AppCodes } from "../errors/AppCodes";
 import { HttpCodes } from "../errors/HttpCodes";
@@ -19,10 +17,21 @@ import {
   resetPasswordService,
 } from "../services/auth.service";
 
+import {
+  registerDTO,
+  loginDTO,
+  verifyEmailDTO,
+  resendVerificationEmailDTO,
+  forgotPasswordDTO,
+  resetPasswordDTO,
+} from "../dto/auth";
+
 import { sendVerificationEmail, sendResetPasswordEmail } from "../utils/email";
 
 export const register = async (req: Request, res: Response) => {
-  const { user, verificationToken } = await registerService(req.body);
+  const dto : registerDTO = req.body;
+
+  const { user, verificationToken } = await registerService(dto);
 
   await sendVerificationEmail({
     name: user.name,
@@ -41,7 +50,9 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  const { tokenUser, refreshToken } = await loginService(req.body, {
+  const dto :loginDTO = req.body;
+  
+  const { tokenUser, refreshToken } = await loginService(dto, {
     ip: req.ip,
     userAgent: req.headers["user-agent"],
   });
@@ -78,7 +89,9 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
-  const { token, email } = req.body;
+  const dto : verifyEmailDTO = req.body;
+
+  const { token, email } = dto;
   if (!token || !email) {
     CustomError.throwError(
       HttpCodes.BAD_REQUEST,
@@ -97,15 +110,17 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 export const resendVerificationEmail = async (req: Request, res: Response) => {
-  const { email } = req.body;
-  if (!email) {
+  const dto : resendVerificationEmailDTO = {
+    email: req.body.email,
+  };
+  if (!dto.email) {
     CustomError.throwError(
       HttpCodes.BAD_REQUEST,
       AppCodes.MISSING_REQUIRED_FIELD,
       "missing required input",
     );
   }
-  const user = await resendVerificationEmailService(email);
+  const user = await resendVerificationEmailService(dto.email);
 
   if (user) {
     await sendVerificationEmail({
@@ -126,7 +141,8 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
-  const { email } = req.body;
+  const dto : forgotPasswordDTO = req.body;
+  const { email } = dto;
   if (!email) {
     CustomError.throwError(
       HttpCodes.BAD_REQUEST,
@@ -154,7 +170,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-  const { email, token, password } = req.body;
+  const dto : resetPasswordDTO = req.body;
+  const { email, token, password } = dto;
   if (!email || !token || !password) {
     CustomError.throwError(
       HttpCodes.BAD_REQUEST,
@@ -163,7 +180,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     );
   }
   await resetPasswordService({ email, token, password });
-  
+
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Password reset successfully",

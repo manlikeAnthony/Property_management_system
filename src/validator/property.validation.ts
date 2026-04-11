@@ -105,3 +105,9 @@ export const updatePropertySchema = Joi.object({
     }),
 });
 
+const getAllPropertiesByTypeSchema = Joi.object({
+    type: Joi.string().valid("RENT", "SALE").required().messages({
+        "any.only": "Type must be either 'RENT' or 'SALE'",
+        "any.required": "Type query parameter is required",
+    }),
+});

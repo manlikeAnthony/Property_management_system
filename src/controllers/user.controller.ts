@@ -6,15 +6,17 @@ import { successResponse } from "../response";
 import { checkPermissions } from "../utils";
 import { Request, Response } from "express";
 import {
-  getAllAdminsService,
   getCurrentUserService,
   getAllUsersService,
   getSingleUserService,
 } from "../services/user.service";
 import type {Params} from "../types/auth.types";
+import {parseUserQuery} from "../query/user/userQuery";
 
-export const getAllUsers = async (_req: Request, res: Response) => {
-  const everyOne = await getAllUsersService();
+export const getAllUsers = async (req: Request, res: Response) => {
+  const userQuery = parseUserQuery(req);
+
+  const everyOne = await getAllUsersService(userQuery);
 
   res.status(200).json(
     successResponse({
@@ -25,18 +27,18 @@ export const getAllUsers = async (_req: Request, res: Response) => {
   );
 };
 
-export const getAllAdmins = async (_req: Request, res: Response) => {
+// export const getAllAdmins = async (_req: Request, res: Response) => {
   
-  const admins = await getAllAdminsService();
+//   const admins = await getAllAdminsService();
 
-  res.status(200).json(
-    successResponse({
-      message: "All Admins Fetched Successfully",
-      data: admins,
-      code: AppCodes.SUCCESS,
-    }),
-  );
-};
+//   res.status(200).json(
+//     successResponse({
+//       message: "All Admins Fetched Successfully",
+//       data: admins,
+//       code: AppCodes.SUCCESS,
+//     }),
+//   );
+// };
 
 export const getCurrentUser = async (req: Request, res: Response) => {
   const user = await getCurrentUserService((req as any).user.userId);

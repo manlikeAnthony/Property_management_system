@@ -2,7 +2,7 @@ export type ResendVerificationEmailResponse = {
   name: string;
   email: string;
   verificationToken: string;
-};
+} | undefined;
 
 export type ForgotPasswordResponse = {
   name: string;

@@ -142,7 +142,7 @@ export const verifyEmailService = async (token: string, email: string) => {
       "missing required input",
     );
   }
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("-password");
   if (!user) {
     CustomError.throwError(
       HttpCodes.NOT_FOUND,
@@ -180,13 +180,20 @@ export const resendVerificationEmailService = async (
 ): Promise<ResendVerificationEmailResponse> => {
   const user = await User.findOne({ email });
   if (!user) {
-    CustomError.throwError(
-      HttpCodes.NOT_FOUND,
-      AppCodes.USER_NOT_FOUND,
-      "User not found",
+    CustomLogger.info(
+      "resendVerificationEmailService",
+      AppCodes.RESEND_VERIFICATION_EMAIL_NON_EXISTENT_EMAIL,
+      { message: `Resend verification email requested for non-existent email: ${email}` },
     );
+    return undefined; // Don't reveal that the email doesn't exist
   }
+
   if (user.isVerified) {
+    CustomLogger.info(
+      "resendVerificationEmailService",
+      AppCodes.USER_ALREADY_VERIFIED,
+      { message: `Resend verification email requested for already verified email: ${email}` },
+    );
     CustomError.throwError(
       HttpCodes.CONFLICT,
       AppCodes.USER_ALREADY_VERIFIED,

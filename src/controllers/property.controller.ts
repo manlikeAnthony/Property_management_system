@@ -7,10 +7,9 @@ import {
   updatePropertyService,
   getPropertyByIdService,
   getMyRentedPropertiesService,
-  getMyListedPropertiesService,
-  getAllPropertiesByTypeService,
-  getAllPropertiesByLocationService,
+  getMyListedPropertiesService
 } from "../services/property.service";
+
 import { successResponse } from "../response";
 import { HttpCodes } from "../errors/HttpCodes";
 import { AppCodes } from "../errors/AppCodes";
@@ -212,48 +211,49 @@ export const getMyListedProperties = async (req: Request, res: Response) => {
   );
 };
 
-export const getAllPropertiesByType = async (req: Request, res: Response) => {
-  const query = parsePropertyQuery(req);
+/// FUNCTIONALITY ALREADY INTEGRATED IN getAllProperties WITH FILTERS. ENDPOINTS KEPT COMMENTED OUT FOR FUTURE REFERENCE IF NEEDED
+// export const getAllPropertiesByType = async (req: Request, res: Response) => {
+//   const query = parsePropertyQuery(req);
 
-  if (!query.filters.type) {
-    CustomError.throwError(
-      HttpCodes.BAD_REQUEST,
-      AppCodes.INVALID_INPUT,
-      "type query parameter is required ",
-    );
-  }
+//   if (!query.filters.type) {
+//     CustomError.throwError(
+//       HttpCodes.BAD_REQUEST,
+//       AppCodes.INVALID_INPUT,
+//       "type query parameter is required ",
+//     );
+//   }
 
-  const properties = await getAllPropertiesByTypeService(query);
-  res.status(HttpCodes.OK).json(
-    successResponse({
-      message: "Properties fetched successfully",
-      data: properties,
-      code: AppCodes.SUCCESS,
-    }),
-  );
-};
+//   const properties = await getAllPropertiesByTypeService(query);
+//   res.status(HttpCodes.OK).json(
+//     successResponse({
+//       message: "Properties fetched successfully",
+//       data: properties,
+//       code: AppCodes.SUCCESS,
+//     }),
+//   );
+// };
 
-export const getAllPropertiesByLocation = async (
-  req: Request,
-  res: Response,
-) => {
-  const query = parsePropertyQuery(req);
+// export const getAllPropertiesByLocation = async (
+//   req: Request,
+//   res: Response,
+// ) => {
+//   const query = parsePropertyQuery(req);
 
-  if (!query.filters.city && !query.filters.state && !query.filters.country) {
-    CustomError.throwError(
-      HttpCodes.BAD_REQUEST,
-      AppCodes.INVALID_INPUT,
-      "At least one of city, state or country query parameters is required",
-    );
-  }
+//   if (!query.filters.city && !query.filters.state && !query.filters.country) {
+//     CustomError.throwError(
+//       HttpCodes.BAD_REQUEST,
+//       AppCodes.INVALID_INPUT,
+//       "At least one of city, state or country query parameters is required",
+//     );
+//   }
 
-  const properties = await getAllPropertiesByLocationService(query);
+//   const properties = await getAllPropertiesByLocationService(query);
 
-  res.status(HttpCodes.OK).json(
-    successResponse({
-      message: "Properties fetched successfully",
-      data: properties,
-      code: AppCodes.SUCCESS,
-    }),
-  );
-};
+//   res.status(HttpCodes.OK).json(
+//     successResponse({
+//       message: "Properties fetched successfully",
+//       data: properties,
+//       code: AppCodes.SUCCESS,
+//     }),
+//   );
+// };

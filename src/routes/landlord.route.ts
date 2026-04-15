@@ -24,6 +24,6 @@ router.get("/applications", authenticateUser,authorizeRoles("ADMIN"), asyncHandl
 router.get("/approved", authenticateUser,authorizeRoles("ADMIN"), asyncHandler(getAllApprovedLandlords));
 router.get("/rejected", authenticateUser,authorizeRoles("ADMIN"), asyncHandler(getAllRejectedLandlords));
 router.get("/:id", authenticateUser, asyncHandler(getSingleLandlord));
-router.delete("/:id", authenticateUser, asyncHandler(deleteLandlord));
+router.delete("/:id", authenticateUser,authorizeRoles("ADMIN" , "LANDLORD"), asyncHandler(deleteLandlord));
 
 export default router;

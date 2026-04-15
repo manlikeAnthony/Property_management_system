@@ -33,16 +33,18 @@ export const register = async (req: Request, res: Response) => {
 
   const { user, verificationToken } = await registerService(dto);
 
-  await sendVerificationEmail({
+  sendVerificationEmail({
     name: user.name,
     email: user.email,
     verificationToken: verificationToken,
     origin: "http://localhost:3000",
+  }).catch((err) => {
+    console.error("Error sending verification email:", err);
   });
 
   res.status(HttpCodes.CREATED).json(
     successResponse({
-      message: "User registered successfully",
+      message: "User registered successfully , Check your email to verify your account",
       data: null,
       code: AppCodes.USER_CREATED,
     }),

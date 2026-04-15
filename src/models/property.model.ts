@@ -13,6 +13,12 @@ const LocationSchema = new Schema(
     coordinates: {
       type: [Number],
       required: true,
+      validate: {
+        validator: function (val: number[]) {
+          return val.length === 2;
+        },
+        message: "Coordinates must be [longitude, latitude]",
+      },
     },
   },
   { _id: false },
@@ -101,9 +107,9 @@ const PropertySchema = new Schema<PropertyDocument>(
     },
 
     address: {
-      street: { type: String, required: true  , maxlength: 100},
-      city: { type: String, required: true , maxlength: 50},
-      state: { type: String, required: true , maxlength: 50},
+      street: { type: String, required: true, maxlength: 100 },
+      city: { type: String, required: true, maxlength: 50 },
+      state: { type: String, required: true, maxlength: 50 },
       country: { type: String, default: "Nigeria" },
     },
 
@@ -135,12 +141,14 @@ const PropertySchema = new Schema<PropertyDocument>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
     listedBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
     images: [
@@ -153,24 +161,57 @@ const PropertySchema = new Schema<PropertyDocument>(
     isPublished: {
       type: Boolean,
       default: false,
+      index: true,
     },
-    tenants: [
-      {
-        userId: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+    // tenants: [
+    //   {
+    //     userId: {
+    //       type: Schema.Types.ObjectId,
+    //       ref: "User",
+    //     },
+    //     createdAt: {
+    //       type: Date,
+    //       default: Date.now,
+    //     },
+    //   },
+    // ], independent model now
   },
   { timestamps: true },
 );
 
-// PropertySchema.index({ location: "2dsphere" }); til geocoding is added
+PropertySchema.index({ location: "2dsphere" });
+PropertySchema.index({ type: 1, status: 1, createdAt: -1 });
+PropertySchema.index({ price: 1 });
+PropertySchema.index({ createdAt: -1 });
+PropertySchema.index({ owner: 1, isPublished: 1 });
+
+PropertySchema.pre("save", function () {
+  if (this.type === "SALE" && this.status === "RENTED") {
+    throw new Error("SALE property cannot be RENTED");
+  }
+  if (this.type === "RENT" && this.status === "SOLD") {
+    throw new Error("RENT property cannot be SOLD");
+  }
+});
+
+PropertySchema.pre("findOneAndUpdate", async function () {
+  const update = this.getUpdate() as Partial<PropertyDocument>;
+
+  const docToUpdate = await this.model.findOne(this.getQuery());
+
+  if (!docToUpdate) return;
+
+  const newType = update.type ?? docToUpdate.type;
+  const newStatus = update.status ?? docToUpdate.status;
+
+  if (newType === "SALE" && newStatus === "RENTED") {
+    throw new Error("SALE property cannot be RENTED");
+  }
+
+  if (newType === "RENT" && newStatus === "SOLD") {
+    throw new Error("RENT property cannot be SOLD");
+  }
+});
 
 export const Property = model<PropertyDocument>("Property", PropertySchema);
 export default Property;

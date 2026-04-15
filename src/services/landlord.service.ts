@@ -12,7 +12,7 @@ export const becomeLandlordService = async (userId: string) => {
       "User ID is required"
     );
   }
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select("-password");
 
   if (!user) {
     CustomError.throwError(
@@ -47,7 +47,7 @@ export const approveLandlordService = async (userId: string) => {
     );
   }
 
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select("-password");
 
   if (!user) {
     CustomError.throwError(
@@ -63,6 +63,23 @@ export const approveLandlordService = async (userId: string) => {
       "User is not a landlord",
     );
   }
+
+  if(user.landlordProfile.applicationStatus === "REJECTED"){
+    CustomError.throwError(
+      HttpCodes.CONFLICT,
+      AppCodes.LANDLORD_ALREADY_REJECTED,
+      "Landlord application is already rejected and cannot be approved"
+    );
+  }
+
+    if(user.landlordProfile.applicationStatus === "APPROVED"){
+      CustomError.throwError(
+        HttpCodes.CONFLICT,
+        AppCodes.LANDLORD_ALREADY_APPROVED,
+        "Landlord application is already approved"
+      )
+    }
+
   user.landlordProfile.applicationStatus = "APPROVED";
   user.landlordProfile.isActiveLandlord = true;
   user.landlordProfile.approvedAt = new Date();
@@ -71,7 +88,7 @@ export const approveLandlordService = async (userId: string) => {
 };
 
 export const rejectLandlordService = async (userId: string) => {
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select("-password");
 
   if (!user) {
     CustomError.throwError(
@@ -103,27 +120,27 @@ export const rejectLandlordService = async (userId: string) => {
 };
 
 export const getAllLandlordsService = async () => {
-  const landlords = await User.find({ roles: "LANDLORD" });
+  const landlords = await User.find({ roles: "LANDLORD" }).select("-password");
   return landlords;
 };
 
 export const getAllLandlordApplicationsService = async () => {
-  const applications = await User.find({ "landlordProfile.applicationStatus": "PENDING" });
+  const applications = await User.find({ "landlordProfile.applicationStatus": "PENDING" }).select("-password");
   return applications;
 };
 
 export const getAllApprovedLandlordsService = async () => {
-  const approvedLandlords = await User.find({ "landlordProfile.applicationStatus": "APPROVED" });
+  const approvedLandlords = await User.find({ "landlordProfile.applicationStatus": "APPROVED" }).select("-password");
   return approvedLandlords;
 }
 
 export const getAllRejectedLandlordsService = async () => {
-  const rejectedLandlords = await User.find({ "landlordProfile.applicationStatus": "REJECTED" });
+  const rejectedLandlords = await User.find({ "landlordProfile.applicationStatus": "REJECTED" }).select("-password");
   return rejectedLandlords;
 }
 
 export const getMyLandlordProfileService = async (userId: string) => {
-  const landlord = await User.findById(userId);
+  const landlord = await User.findById(userId).select("-password");
   if (!landlord || !landlord.roles.includes("LANDLORD")) {
     CustomError.throwError(
       HttpCodes.NOT_FOUND,
@@ -136,7 +153,7 @@ export const getMyLandlordProfileService = async (userId: string) => {
 
 
 export const getSingleLandlordService = async (userId: string) => {
-  const landlord = await User.findById(userId);
+  const landlord = await User.findById(userId).select("-password");
 
   if (!landlord || !landlord.roles.includes("LANDLORD")) {
     CustomError.throwError(
@@ -149,7 +166,7 @@ export const getSingleLandlordService = async (userId: string) => {
 };
 
 export const deleteLandlordService = async (userId: string) => {
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select("-password");
 
   if (!user) {
     CustomError.throwError(

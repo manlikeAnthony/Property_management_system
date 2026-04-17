@@ -60,10 +60,7 @@ export interface PropertyDocument extends Document {
   }[];
 
   isPublished: boolean;
-  tenants?: {
-    userId: Types.ObjectId;
-    createdAt: Date;
-  }[];
+  maxTenants: number;
 
   createdAt: Date;
   updatedAt: Date;
@@ -163,18 +160,11 @@ const PropertySchema = new Schema<PropertyDocument>(
       default: false,
       index: true,
     },
-    // tenants: [
-    //   {
-    //     userId: {
-    //       type: Schema.Types.ObjectId,
-    //       ref: "User",
-    //     },
-    //     createdAt: {
-    //       type: Date,
-    //       default: Date.now,
-    //     },
-    //   },
-    // ], independent model now
+    maxTenants: {
+      type: Number,
+      default: 1,
+      min: 1,
+    },
   },
   { timestamps: true },
 );

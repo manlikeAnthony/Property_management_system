@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import Property from "../models/property.model";
+import Ownership from "../models/ownership.model";
 import { CustomError } from "../errors/CustomError";
 import { HttpCodes } from "../errors/HttpCodes";
 import { AppCodes } from "../errors/AppCodes";
@@ -11,6 +13,7 @@ import {
 } from "../dto/property";
 import { PropertyQuery } from "../query/property/propertyQuery";
 import { geocodeAddress } from "../utils/geocoder";
+import { initializeOwnershipService } from "./ownership.service";
 
 export const createPropertyService = async (
   data: CreatePropertyWithImagesDTO,
@@ -70,7 +73,7 @@ export const createPropertyService = async (
     images,
   } = data;
 
-  const addressString  = `${address.street}, ${address.city}, ${address.state}, ${address.country}`;
+  const addressString = `${address.street}, ${address.city}, ${address.state}, ${address.country}`;
 
   const geo = await geocodeAddress(addressString);
 
@@ -79,75 +82,92 @@ export const createPropertyService = async (
     coordinates: [geo.lng, geo.lat],
   };
 
-  const property = await Property.create({
-    title,
-    description,
-    price,
-    type,
-    address,
-    location,
-    formattedAddress: geo.formattedAddress,
-    bedrooms,
-    bathrooms,
-    area,
-    owner: userRecord._id,
-    listedBy: userRecord._id,
-    images: images || [],
-    isPublished: false,
-  });
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  return property;
+  try {
+    const property = await Property.create(
+      [
+        {
+          ...data,
+          location,
+          formattedAddress: geo.formattedAddress,
+          owner: user.userId,
+          listedBy: userRecord._id,
+          images: images || [],
+          isPublished: false,
+          status: "AVAILABLE",
+        },
+      ],
+      { session },
+    );
+
+    await initializeOwnershipService(
+      property[0]._id.toString(),
+      user.userId,
+      session,
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return property[0];
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };
 
 export const getAllPropertiesService = async (query: PropertyQuery) => {
-  const { filters , pagination , sort} = query;
+  const { filters, pagination, sort } = query;
   const mongoQuery: any = {};
 
   if (filters.type) {
     mongoQuery.type = filters.type;
   }
-  if(filters.city) {
+  if (filters.city) {
     mongoQuery["address.city"] = {
       $regex: filters.city,
       $options: "i",
     };
   }
-  if(filters.state) {
+  if (filters.state) {
     mongoQuery["address.state"] = {
       $regex: filters.state,
       $options: "i",
     };
   }
-  if(filters.country) {
+  if (filters.country) {
     mongoQuery["address.country"] = {
       $regex: filters.country,
       $options: "i",
     };
   }
 
-  if(filters.minPrice || filters.maxPrice){
+  if (filters.minPrice || filters.maxPrice) {
     mongoQuery.price = {};
-    if(filters.minPrice !== undefined){
-      mongoQuery.price.$gte = filters.minPrice
+    if (filters.minPrice !== undefined) {
+      mongoQuery.price.$gte = filters.minPrice;
     }
-    if(filters.maxPrice !== undefined){
-      mongoQuery.price.$lte = filters.maxPrice 
+    if (filters.maxPrice !== undefined) {
+      mongoQuery.price.$lte = filters.maxPrice;
     }
   }
-  if(filters.search){
+  if (filters.search) {
     mongoQuery.$or = [
       {
-        title : {$regex : filters.search , $options : "i"}
+        title: { $regex: filters.search, $options: "i" },
       },
       {
-        description : {$regex : filters.search , $options : "i"}
-      }
-    ]
+        description: { $regex: filters.search, $options: "i" },
+      },
+    ];
   }
   const properties = await Property.find(mongoQuery)
     .skip(pagination.skip)
     .limit(pagination.limit)
-    .sort({[sort.field] : sort.order});
+    .sort({ [sort.field]: sort.order });
 
   return properties;
 };
@@ -279,52 +299,3 @@ export const getMyListedPropertiesService = async (userId: string) => {
   return properties;
 };
 
-//all functionality integrated into getAllProper
-// export const getAllPropertiesByTypeService = async (query: PropertyQuery) => {
-//   const { filters, pagination } = query;
-
-//   const properties = await Property.find({
-//     isPublished: true,
-//     type: filters.type,
-//   })
-//     .skip(pagination.skip)
-//     .limit(pagination.limit)
-//     .sort({ createdAt: -1 });
-
-//   return properties;
-// };
-
-// export const getAllPropertiesByLocationService = async (
-//   query: PropertyQuery,
-// ) => {
-//   const { filters, pagination } = query;
-//   const mongoQuery: any = {
-//     isPublished: true,
-//   };
-//   if (filters.city) {
-//     mongoQuery["address.city"] = {
-//       $regex: filters.city,
-//       $options: "i",
-//     };
-//   }
-
-//   if (filters.state) {
-//     mongoQuery["address.state"] = {
-//       $regex: filters.state,
-//       $options: "i",
-//     };
-//   }
-
-//   if (filters.country) {
-//     mongoQuery["address.country"] = {
-//       $regex: filters.country,
-//       $options: "i",
-//     };
-//   }
-
-//   const properties = await Property.find(mongoQuery)
-//     .skip(pagination.skip)
-//     .limit(pagination.limit)
-//     .sort({ createdAt: -1 });
-//   return properties;
-// };

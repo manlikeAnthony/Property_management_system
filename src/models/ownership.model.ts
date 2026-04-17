@@ -30,5 +30,12 @@ const OwnershipSchema = new Schema<OwnershipDocument>(
   { timestamps: true }
 );
 
+OwnershipSchema.index(
+  {property: 1, disposedAt: 1},
+  {unique: true, partialFilterExpression: {disposedAt: null}}
+)
+
+
+
 export const Ownership = model<OwnershipDocument>("Ownership", OwnershipSchema);
 export default Ownership;

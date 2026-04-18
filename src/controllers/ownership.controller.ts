@@ -13,6 +13,7 @@ import {
 import { Request, Response } from "express";
 import { Params } from "../types/auth.types";
 import { successResponse } from "../response";
+import {parseOwnershipQuery} from "../query/ownership/ownership.query";
 
 export const purchaseProperty = async (req: Request<Params>, res: Response) => {
   const { id: propertyId } = req.params;
@@ -48,7 +49,8 @@ export const getOwnershipHistory = async (
   res: Response,
 ) => {
   const { id: propertyId } = req.params;
-  const history = await getOwnershipHistoryService(propertyId , req.user);
+  const query = parseOwnershipQuery(req);
+  const history = await getOwnershipHistoryService(propertyId , req.user , query);
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Ownership history retrieved successfully",

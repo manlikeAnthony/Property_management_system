@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import Property from "../models/property.model";
 import Transaction from "../models/transaction.model";
 import { checkPermissions } from "../utils/checkPermission";
+import { OwnershipQuery } from "../query/ownership/ownership.query";
 
 export const purchasePropertyService = async (
   propertyId: string,
@@ -184,6 +185,7 @@ export const transferOwnershipService = async (
 export const getOwnershipHistoryService = async (
   propertyId: string,
   requestUser: any,
+  query: OwnershipQuery
 ) => {
   const currentOwner = await Ownership.findOne({
     property: propertyId,
@@ -202,11 +204,15 @@ export const getOwnershipHistoryService = async (
     checkPermissions(requestUser, currentOwner.owner);
   }
 
+  const { pagination, sort } = query;
+
   const ownershipHistory = await Ownership.find({
     property: propertyId,
   })
-    .sort({ acquiredAt: -1 })
-    .populate({ path: "owner", select: "name email" });
+    .populate({ path: "owner", select: "name email" })
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ [sort.field]: sort.order });
 
   if (ownershipHistory.length === 0) {
     CustomError.throwError(
@@ -218,6 +224,7 @@ export const getOwnershipHistoryService = async (
 
   return ownershipHistory;
 };
+
 export const getCurrentOwnerService = async (propertyId: string) => {
   return Ownership.findOne({ property: propertyId, disposedAt: null }).populate(
     { path: "owner", select: "name email" },

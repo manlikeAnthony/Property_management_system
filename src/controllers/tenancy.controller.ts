@@ -12,6 +12,7 @@ import { Params } from "../types/auth.types";
 import { successResponse } from "../response";
 import { HttpCodes } from "../errors/HttpCodes";
 import { AppCodes } from "../errors/AppCodes";
+import { parseTenancyQuery } from "../query/tenancy/tenancy.query";
 
 export const createTenancy = async (req: Request<Params>, res: Response) => {
   const { id: propertyId } = req.params;
@@ -51,7 +52,13 @@ export const getActiveTenanciesByProperty = async (
   res: Response,
 ) => {
   const { id: propertyId } = req.params;
-  const tenancies = await getActiveTenanciesByPropertyService(propertyId);
+  const query = parseTenancyQuery(req);
+
+  const tenancies = await getActiveTenanciesByPropertyService(
+    propertyId,
+    query,
+  );
+
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Active tenancies retrieved successfully",
@@ -63,7 +70,10 @@ export const getActiveTenanciesByProperty = async (
 
 export const getUserTenancies = async (req: Request, res: Response) => {
   const userId = req.user.userId;
-  const tenancies = await getUserTenanciesService(userId);
+  const query = parseTenancyQuery(req);
+
+  const tenancies = await getUserTenanciesService(userId, query);
+
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "User tenancies retrieved successfully",
@@ -75,7 +85,10 @@ export const getUserTenancies = async (req: Request, res: Response) => {
 
 export const getLandlordTenancies = async (req: Request, res: Response) => {
   const landlordId = req.user.userId;
-  const tenancies = await getLandlordTenanciesService(landlordId);
+  const query = parseTenancyQuery(req);
+
+  const tenancies = await getLandlordTenanciesService(landlordId, query);
+
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Landlord tenancies retrieved successfully",
@@ -84,7 +97,6 @@ export const getLandlordTenancies = async (req: Request, res: Response) => {
     }),
   );
 };
-
 export const getTenancyById = async (req: Request<Params>, res: Response) => {
   const { id: tenancyId } = req.params;
   const tenancy = await getTenancyByIdService(tenancyId);
@@ -97,8 +109,11 @@ export const getTenancyById = async (req: Request<Params>, res: Response) => {
   );
 };
 
-export const getAllTenancies = async (_req: Request, res: Response) => {
-  const tenancies = await getAllTenanciesService();
+export const getAllTenancies = async (req: Request, res: Response) => {
+  const query = parseTenancyQuery(req);
+
+  const tenancies = await getAllTenanciesService(query);
+
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "All tenancies retrieved successfully",

@@ -6,6 +6,7 @@ import { AppCodes } from "../errors/AppCodes";
 import mongoose from "mongoose";
 import { getActiveTenancyFilter } from "../utils/tenancy.utils";
 import { computePropertyStatus } from "../utils/property.utils";
+import { TenancyQuery } from "../query/tenancy/tenancy.query";
 
 export const createTenancyService = async (
   propertyId: string,
@@ -101,7 +102,6 @@ export const createTenancyService = async (
     await session.commitTransaction();
     session.endSession();
     return tenancy;
-
   } catch (error) {
     session.abortTransaction();
     session.endSession();
@@ -125,7 +125,7 @@ export const terminateTenancyService = async (
         "Tenancy not found",
       );
     }
-    
+
     if (
       requestUser.userId !== tenancy.landlord.toString() &&
       requestUser.userId !== tenancy.tenant.toString() &&
@@ -137,7 +137,7 @@ export const terminateTenancyService = async (
         "Not authorized to terminate this tenancy",
       );
     }
-    
+
     if (tenancy.status !== "ACTIVE") {
       CustomError.throwError(
         HttpCodes.BAD_REQUEST,
@@ -150,7 +150,10 @@ export const terminateTenancyService = async (
     tenancy.endDate = new Date();
     await tenancy.save({ session });
 
-  const status = await computePropertyStatus(tenancy.property.toString(), session);
+    const status = await computePropertyStatus(
+      tenancy.property.toString(),
+      session,
+    );
 
     await Property.findByIdAndUpdate(
       tenancy.property,
@@ -169,29 +172,56 @@ export const terminateTenancyService = async (
 
 export const getActiveTenanciesByPropertyService = async (
   propertyId: string,
+  query: TenancyQuery,
 ) => {
+  const { pagination, sort } = query;
+
   const tenancies = await Tenancy.find({
     property: propertyId,
     ...getActiveTenancyFilter(),
-  }).populate("tenant", "name email");
+  })
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ [sort.field]: sort.order })
+    .populate("tenant", "name email");
+
   return tenancies;
 };
 
-export const getUserTenanciesService = async (userId: string) => {
+export const getUserTenanciesService = async (
+  userId: string,
+  query: TenancyQuery,
+) => {
+  const { pagination, sort } = query;
+
   const tenancies = await Tenancy.find({
     tenant: userId,
     ...getActiveTenancyFilter(),
-  }).populate("property", "title location price");
+  })
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ [sort.field]: sort.order })
+    .populate("property", "title location price");
+
   return tenancies;
 };
 
-export const getLandlordTenanciesService = async (landlordId: string) => {
+export const getLandlordTenanciesService = async (
+  landlordId: string,
+  query: TenancyQuery,
+) => {
+  const { pagination, sort } = query;
+
   const tenancies = await Tenancy.find({
     landlord: landlordId,
     ...getActiveTenancyFilter(),
   })
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ [sort.field]: sort.order })
     .populate("property", "title location price")
     .populate("tenant", "name email");
+
   return tenancies;
 };
 
@@ -212,10 +242,16 @@ export const getTenancyByIdService = async (tenancyId: string) => {
   return tenancy;
 };
 
-export const getAllTenanciesService = async () => {
+export const getAllTenanciesService = async (query: TenancyQuery) => {
+  const { pagination, sort } = query;
+
   const tenancies = await Tenancy.find()
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ [sort.field]: sort.order })
     .populate("property", "title location price")
     .populate("tenant", "name email")
     .populate("landlord", "name email");
+
   return tenancies;
 };

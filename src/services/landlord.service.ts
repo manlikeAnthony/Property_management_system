@@ -3,6 +3,7 @@ import { CustomError } from "../errors/CustomError";
 import { HttpCodes } from "../errors/HttpCodes";
 import User from "../models/user.model";
 import { checkPermissions } from "../utils";
+import {LandlordQuery} from "../query/landlord/landlord.query";
 
 export const becomeLandlordService = async (userId: string) => {
   if (!userId) {
@@ -119,23 +120,69 @@ export const rejectLandlordService = async (userId: string) => {
   return user;
 };
 
-export const getAllLandlordsService = async () => {
-  const landlords = await User.find({ roles: "LANDLORD" }).select("-password");
+export const getAllLandlordsService = async (query: LandlordQuery) => {
+  const { filters, pagination, sort } = query;
+
+  const mongoQuery: any = {
+    roles: "LANDLORD",
+  };
+
+  if (filters.status) {
+    mongoQuery["landlordProfile.applicationStatus"] = filters.status;
+  }
+
+  if (filters.search) {
+    mongoQuery.$or = [
+      { name: { $regex: filters.search, $options: "i" } },
+      { email: { $regex: filters.search, $options: "i" } },
+    ];
+  }
+
+  const landlords = await User.find(mongoQuery)
+    .select("-password")
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .sort({ [sort.field]: sort.order });
+
   return landlords;
 };
 
-export const getAllLandlordApplicationsService = async () => {
-  const applications = await User.find({ "landlordProfile.applicationStatus": "PENDING" }).select("-password");
+export const getAllLandlordApplicationsService = async (query: LandlordQuery) => {
+  const applications = await User.find({
+    "landlordProfile.applicationStatus": "PENDING",
+    roles: "LANDLORD",
+  })
+    .select("-password")
+    .skip(query.pagination.skip)
+    .limit(query.pagination.limit)
+    .sort({ [query.sort.field]: query.sort.order });
+
   return applications;
 };
 
-export const getAllApprovedLandlordsService = async () => {
-  const approvedLandlords = await User.find({ "landlordProfile.applicationStatus": "APPROVED" }).select("-password");
-  return approvedLandlords;
-}
+export const getAllApprovedLandlordsService = async (query: LandlordQuery) => {
+  const approvedLandlords = await User.find({
+    "landlordProfile.applicationStatus": "APPROVED",
+    roles: "LANDLORD",
+  })
+    .select("-password")
+    .skip(query.pagination.skip)
+    .limit(query.pagination.limit)
+    .sort({ [query.sort.field]: query.sort.order });
 
-export const getAllRejectedLandlordsService = async () => {
-  const rejectedLandlords = await User.find({ "landlordProfile.applicationStatus": "REJECTED" }).select("-password");
+  return approvedLandlords;
+};
+
+export const getAllRejectedLandlordsService = async (query: LandlordQuery) => {
+  const rejectedLandlords = await User.find({
+    "landlordProfile.applicationStatus": "REJECTED",
+    roles: "LANDLORD",
+  })
+    .select("-password")
+    .skip(query.pagination.skip)
+    .limit(query.pagination.limit)
+    .sort({ [query.sort.field]: query.sort.order });
+
   return rejectedLandlords;
 }
 

@@ -1,17 +1,17 @@
 {
   "/src": {
-    "percentage": 36,
-    "totalStatements": 1574,
-    "coveredStatements": 573
+    "percentage": 21,
+    "totalStatements": 4568,
+    "coveredStatements": 958
   },
   "/": {
-    "percentage": 36,
-    "totalStatements": 1574,
-    "coveredStatements": 573
+    "percentage": 21,
+    "totalStatements": 4568,
+    "coveredStatements": 958
   },
   "/src/app.ts": {
     "percentage": 0,
-    "totalStatements": 27,
+    "totalStatements": 31,
     "coveredStatements": 0,
     "testables": []
   },
@@ -35,8 +35,8 @@
     ]
   },
   "/src/config": {
-    "percentage": 55,
-    "totalStatements": 49,
+    "percentage": 35,
+    "totalStatements": 77,
     "coveredStatements": 27
   },
   "/src/config/database.ts": {
@@ -64,6 +64,19 @@
     "coveredStatements": 12,
     "testables": []
   },
+  "/src/config/multer.ts": {
+    "percentage": 0,
+    "totalStatements": 28,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "upload",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
   "/src/config/nodemailer.ts": {
     "percentage": 100,
     "totalStatements": 15,
@@ -71,26 +84,26 @@
     "testables": []
   },
   "/src/controllers": {
-    "percentage": 40,
-    "totalStatements": 244,
-    "coveredStatements": 97
+    "percentage": 21,
+    "totalStatements": 913,
+    "coveredStatements": 193
   },
   "/src/controllers/auth.controller.ts": {
-    "percentage": 61,
-    "totalStatements": 159,
-    "coveredStatements": 97,
+    "percentage": 100,
+    "totalStatements": 193,
+    "coveredStatements": 193,
     "testables": [
       {
         "name": "register",
         "percentage": 100,
-        "totalStatements": 17,
-        "coveredStatements": 17
+        "totalStatements": 21,
+        "coveredStatements": 21
       },
       {
         "name": "login",
         "percentage": 100,
-        "totalStatements": 15,
-        "coveredStatements": 15
+        "totalStatements": 17,
+        "coveredStatements": 17
       },
       {
         "name": "logout",
@@ -101,42 +114,244 @@
       {
         "name": "verifyEmail",
         "percentage": 100,
-        "totalStatements": 11,
-        "coveredStatements": 11
+        "totalStatements": 19,
+        "coveredStatements": 19
       },
       {
         "name": "resendVerificationEmail",
-        "percentage": 0,
-        "totalStatements": 19,
-        "coveredStatements": 0
+        "percentage": 100,
+        "totalStatements": 29,
+        "coveredStatements": 29
       },
       {
         "name": "forgotPassword",
-        "percentage": 0,
-        "totalStatements": 26,
-        "coveredStatements": 0
+        "percentage": 100,
+        "totalStatements": 27,
+        "coveredStatements": 27
       },
       {
         "name": "resetPassword",
-        "percentage": 0,
-        "totalStatements": 17,
-        "coveredStatements": 0
+        "percentage": 100,
+        "totalStatements": 19,
+        "coveredStatements": 19
       }
     ]
   },
-  "/src/controllers/user.controller.ts": {
+  "/src/controllers/landlord.controller.ts": {
     "percentage": 0,
-    "totalStatements": 85,
+    "totalStatements": 169,
     "coveredStatements": 0,
     "testables": [
       {
-        "name": "getAllUsers",
+        "name": "becomeLandlord",
         "percentage": null,
         "totalStatements": null,
         "coveredStatements": null
       },
       {
-        "name": "getAllAdmins",
+        "name": "approveLandlord",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "rejectLandlord",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getMyLandlordProfile",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllLandlords",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllLandlordApplications",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllApprovedLandlords",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllRejectedLandlords",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getSingleLandlord",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "deleteLandlord",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/controllers/ownership.controller.ts": {
+    "percentage": 0,
+    "totalStatements": 97,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "purchaseProperty",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "transferOwnership",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getOwnershipHistory",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getCurrentOwner",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getOwnershipById",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "deleteOwnership",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/controllers/property.controller.ts": {
+    "percentage": 0,
+    "totalStatements": 259,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "createProperty",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllProperties",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getPropertyById",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "deleteProperty",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "updateProperty",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getMyRentedProperties",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getMyListedProperties",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/controllers/tenancy.controller.ts": {
+    "percentage": 0,
+    "totalStatements": 109,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "createTenancy",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "terminateTenancy",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getActiveTenanciesByProperty",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getUserTenancies",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getLandlordTenancies",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getTenancyById",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllTenancies",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/controllers/user.controller.ts": {
+    "percentage": 0,
+    "totalStatements": 86,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "getAllUsers",
         "percentage": null,
         "totalStatements": null,
         "coveredStatements": null
@@ -161,15 +376,90 @@
       }
     ]
   },
+  "/src/dto/auth": {
+    "percentage": 0,
+    "totalStatements": 30,
+    "coveredStatements": 0
+  },
+  "/src/dto": {
+    "percentage": 0,
+    "totalStatements": 75,
+    "coveredStatements": 0
+  },
+  "/src/dto/auth/forgotPassword.dto.ts": {
+    "percentage": 0,
+    "totalStatements": 3,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/auth/index.ts": {
+    "percentage": 0,
+    "totalStatements": 6,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/auth/login.dto.ts": {
+    "percentage": 0,
+    "totalStatements": 4,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/auth/register.dto.ts": {
+    "percentage": 0,
+    "totalStatements": 5,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/auth/resendVerificationEmail.dto.ts": {
+    "percentage": 0,
+    "totalStatements": 3,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/auth/resetPassword.dto.ts": {
+    "percentage": 0,
+    "totalStatements": 5,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/auth/verfyEmail.dto.ts": {
+    "percentage": 0,
+    "totalStatements": 4,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/property": {
+    "percentage": 0,
+    "totalStatements": 45,
+    "coveredStatements": 0
+  },
+  "/src/dto/property/createProperty.dto.ts": {
+    "percentage": 0,
+    "totalStatements": 26,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/property/index.ts": {
+    "percentage": 0,
+    "totalStatements": 2,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/dto/property/updateProperty.dto.ts": {
+    "percentage": 0,
+    "totalStatements": 17,
+    "coveredStatements": 0,
+    "testables": []
+  },
   "/src/errors": {
     "percentage": 100,
-    "totalStatements": 135,
-    "coveredStatements": 135
+    "totalStatements": 168,
+    "coveredStatements": 168
   },
   "/src/errors/AppCodes.ts": {
     "percentage": 100,
-    "totalStatements": 43,
-    "coveredStatements": 43,
+    "totalStatements": 76,
+    "coveredStatements": 76,
     "testables": []
   },
   "/src/errors/CustomError.ts": {
@@ -199,14 +489,14 @@
     "testables": []
   },
   "/src/logger": {
-    "percentage": 80,
+    "percentage": 100,
     "totalStatements": 50,
-    "coveredStatements": 40
+    "coveredStatements": 50
   },
   "/src/logger/CustomLogger.ts": {
-    "percentage": 64,
+    "percentage": 100,
     "totalStatements": 28,
-    "coveredStatements": 18,
+    "coveredStatements": 28,
     "testables": [
       {
         "name": "CustomLogger",
@@ -217,9 +507,9 @@
       {
         "name": "info",
         "parentName": "CustomLogger",
-        "percentage": 0,
+        "percentage": 100,
         "totalStatements": 10,
-        "coveredStatements": 0
+        "coveredStatements": 10
       },
       {
         "name": "error",
@@ -238,7 +528,7 @@
   },
   "/src/middlewares": {
     "percentage": 0,
-    "totalStatements": 169,
+    "totalStatements": 204,
     "coveredStatements": 0
   },
   "/src/middlewares/async-handler.ts": {
@@ -256,7 +546,7 @@
   },
   "/src/middlewares/authenticate.ts": {
     "percentage": 0,
-    "totalStatements": 64,
+    "totalStatements": 71,
     "coveredStatements": 0,
     "testables": [
       {
@@ -299,20 +589,46 @@
       }
     ]
   },
+  "/src/middlewares/validator.middleware.ts": {
+    "percentage": 0,
+    "totalStatements": 28,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "validate",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
   "/src/models": {
-    "percentage": 45,
-    "totalStatements": 250,
-    "coveredStatements": 112
+    "percentage": 30,
+    "totalStatements": 544,
+    "coveredStatements": 165
   },
   "/src/models/ownership.model.ts": {
     "percentage": 0,
-    "totalStatements": 34,
+    "totalStatements": 41,
     "coveredStatements": 0,
     "testables": []
   },
   "/src/models/property.model.ts": {
     "percentage": 0,
-    "totalStatements": 49,
+    "totalStatements": 207,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "LocationSchema",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/models/tenancy.model.ts": {
+    "percentage": 0,
+    "totalStatements": 74,
     "coveredStatements": 0,
     "testables": []
   },
@@ -329,12 +645,107 @@
     "testables": []
   },
   "/src/models/user.model.ts": {
-    "percentage": 92,
-    "totalStatements": 78,
-    "coveredStatements": 72,
+    "percentage": 94,
+    "totalStatements": 133,
+    "coveredStatements": 125,
     "testables": [
       {
         "name": "comparePassword",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/query/landlord": {
+    "percentage": 0,
+    "totalStatements": 63,
+    "coveredStatements": 0
+  },
+  "/src/query": {
+    "percentage": 0,
+    "totalStatements": 371,
+    "coveredStatements": 0
+  },
+  "/src/query/landlord/landlord.query.ts": {
+    "percentage": 0,
+    "totalStatements": 63,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "parseLandlordQuery",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/query/ownership": {
+    "percentage": 0,
+    "totalStatements": 70,
+    "coveredStatements": 0
+  },
+  "/src/query/ownership/ownership.query.ts": {
+    "percentage": 0,
+    "totalStatements": 70,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "parseOwnershipQuery",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/query/property": {
+    "percentage": 0,
+    "totalStatements": 98,
+    "coveredStatements": 0
+  },
+  "/src/query/property/propertyQuery.ts": {
+    "percentage": 0,
+    "totalStatements": 98,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "parsePropertyQuery",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/query/tenancy": {
+    "percentage": 0,
+    "totalStatements": 72,
+    "coveredStatements": 0
+  },
+  "/src/query/tenancy/tenancy.query.ts": {
+    "percentage": 0,
+    "totalStatements": 72,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "parseTenancyQuery",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/query/user": {
+    "percentage": 0,
+    "totalStatements": 68,
+    "coveredStatements": 0
+  },
+  "/src/query/user/userQuery.ts": {
+    "percentage": 0,
+    "totalStatements": 68,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "parseUserQuery",
         "percentage": null,
         "totalStatements": null,
         "coveredStatements": null
@@ -373,12 +784,24 @@
   },
   "/src/routes": {
     "percentage": 0,
-    "totalStatements": 43,
+    "totalStatements": 106,
     "coveredStatements": 0
   },
   "/src/routes/auth.route.ts": {
     "percentage": 0,
-    "totalStatements": 18,
+    "totalStatements": 29,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/routes/landlord.route.ts": {
+    "percentage": 0,
+    "totalStatements": 29,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/routes/property.route.ts": {
+    "percentage": 0,
+    "totalStatements": 23,
     "coveredStatements": 0,
     "testables": []
   },
@@ -389,26 +812,26 @@
     "testables": []
   },
   "/src/services": {
-    "percentage": 19,
-    "totalStatements": 307,
-    "coveredStatements": 58
+    "percentage": 18,
+    "totalStatements": 1420,
+    "coveredStatements": 251
   },
   "/src/services/auth.service.ts": {
-    "percentage": 23,
-    "totalStatements": 250,
-    "coveredStatements": 58,
+    "percentage": 89,
+    "totalStatements": 282,
+    "coveredStatements": 251,
     "testables": [
       {
         "name": "registerService",
-        "percentage": 69,
+        "percentage": 100,
         "totalStatements": 39,
-        "coveredStatements": 27
+        "coveredStatements": 39
       },
       {
         "name": "loginService",
-        "percentage": 0,
+        "percentage": 100,
         "totalStatements": 72,
-        "coveredStatements": 0
+        "coveredStatements": 72
       },
       {
         "name": "logoutService",
@@ -418,43 +841,290 @@
       },
       {
         "name": "verifyEmailService",
-        "percentage": 0,
+        "percentage": 21,
         "totalStatements": 39,
-        "coveredStatements": 0
+        "coveredStatements": 8
       },
       {
         "name": "resendVerificationEmailService",
-        "percentage": 0,
-        "totalStatements": 26,
-        "coveredStatements": 0
+        "percentage": 100,
+        "totalStatements": 33,
+        "coveredStatements": 33
       },
       {
         "name": "forgotPasswordService",
-        "percentage": 0,
-        "totalStatements": 20,
-        "coveredStatements": 0
+        "percentage": 100,
+        "totalStatements": 29,
+        "coveredStatements": 29
       },
       {
         "name": "resetPasswordService",
-        "percentage": 0,
-        "totalStatements": 23,
-        "coveredStatements": 0
+        "percentage": 100,
+        "totalStatements": 38,
+        "coveredStatements": 38
       }
     ]
   },
-  "/src/services/user.service.ts": {
+  "/src/services/landlord.service.ts": {
     "percentage": 0,
-    "totalStatements": 57,
+    "totalStatements": 192,
     "coveredStatements": 0,
     "testables": [
       {
-        "name": "getAllUsersService",
+        "name": "becomeLandlordService",
         "percentage": null,
         "totalStatements": null,
         "coveredStatements": null
       },
       {
-        "name": "getAllAdminsService",
+        "name": "approveLandlordService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "rejectLandlordService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllLandlordsService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllLandlordApplicationsService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllApprovedLandlordsService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllRejectedLandlordsService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getMyLandlordProfileService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getSingleLandlordService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "deleteLandlordService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/services/ownership.service.ts": {
+    "percentage": 0,
+    "totalStatements": 278,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "purchasePropertyService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "initializeOwnershipService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "transferOwnershipCore",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "transferOwnershipService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getOwnershipHistoryService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getCurrentOwnerService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "assertSingleActiveOwnership",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getOwnershipByIdService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "deleteOwnershipService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/services/property.service.ts": {
+    "percentage": 0,
+    "totalStatements": 327,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "createPropertyService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllPropertiesService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getPropertyByIdService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "deletePropertyService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "updatePropertyService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getMyRentedPropertiesService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getMyListedPropertiesService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/services/s3.service.ts": {
+    "percentage": 0,
+    "totalStatements": 38,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "S3StorageService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "upload",
+        "parentName": "S3StorageService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "delete",
+        "parentName": "S3StorageService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/services/tenancy.service.ts": {
+    "percentage": 0,
+    "totalStatements": 221,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "createTenancyService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "terminateTenancyService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getActiveTenanciesByPropertyService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getUserTenanciesService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getLandlordTenanciesService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getTenancyByIdService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "getAllTenanciesService",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/services/user.service.ts": {
+    "percentage": 0,
+    "totalStatements": 82,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "getAllUsersService",
         "percentage": null,
         "totalStatements": null,
         "coveredStatements": null
@@ -475,18 +1145,24 @@
   },
   "/src/types": {
     "percentage": 0,
-    "totalStatements": 48,
+    "totalStatements": 65,
     "coveredStatements": 0
   },
   "/src/types/auth.types.ts": {
     "percentage": 0,
-    "totalStatements": 17,
+    "totalStatements": 22,
     "coveredStatements": 0,
     "testables": []
   },
   "/src/types/email.ts": {
     "percentage": 0,
     "totalStatements": 15,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/types/property.types.ts": {
+    "percentage": 0,
+    "totalStatements": 12,
     "coveredStatements": 0,
     "testables": []
   },
@@ -497,8 +1173,8 @@
     "testables": []
   },
   "/src/utils": {
-    "percentage": 39,
-    "totalStatements": 183,
+    "percentage": 24,
+    "totalStatements": 293,
     "coveredStatements": 71
   },
   "/src/utils/checkPermission.ts": {
@@ -540,6 +1216,19 @@
       }
     ]
   },
+  "/src/utils/geocoder.ts": {
+    "percentage": 0,
+    "totalStatements": 31,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "geocodeAddress",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
   "/src/utils/index.ts": {
     "percentage": 100,
     "totalStatements": 4,
@@ -562,6 +1251,32 @@
         "percentage": 0,
         "totalStatements": 8,
         "coveredStatements": 0
+      }
+    ]
+  },
+  "/src/utils/property.utils.ts": {
+    "percentage": 0,
+    "totalStatements": 32,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "computePropertyStatus",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/utils/tenancy.utils.ts": {
+    "percentage": 0,
+    "totalStatements": 6,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "getActiveTenancyFilter",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
       }
     ]
   },
@@ -619,6 +1334,47 @@
     "percentage": 100,
     "totalStatements": 4,
     "coveredStatements": 4,
+    "testables": []
+  },
+  "/src/utils/mappers": {
+    "percentage": 0,
+    "totalStatements": 41,
+    "coveredStatements": 0
+  },
+  "/src/utils/mappers/property.mapper.ts": {
+    "percentage": 0,
+    "totalStatements": 41,
+    "coveredStatements": 0,
+    "testables": [
+      {
+        "name": "mapToCreatePropertyDTO",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      },
+      {
+        "name": "mapToUpdatePropertyDTO",
+        "percentage": null,
+        "totalStatements": null,
+        "coveredStatements": null
+      }
+    ]
+  },
+  "/src/validator": {
+    "percentage": 0,
+    "totalStatements": 182,
+    "coveredStatements": 0
+  },
+  "/src/validator/auth.validation.ts": {
+    "percentage": 0,
+    "totalStatements": 69,
+    "coveredStatements": 0,
+    "testables": []
+  },
+  "/src/validator/property.validation.ts": {
+    "percentage": 0,
+    "totalStatements": 113,
+    "coveredStatements": 0,
     "testables": []
   }
 }

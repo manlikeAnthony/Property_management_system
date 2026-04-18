@@ -18,6 +18,7 @@ import {
   deleteLandlordService,
 } from "../services/landlord.service";
 import { Params } from "../types/auth.types";
+import {parseLandlordQuery} from "../query/landlord/landlord.query";
 
 export const becomeLandlord = async (req: Request, res: Response) => {
   const user = await becomeLandlordService(req.user!.userId);
@@ -81,8 +82,9 @@ export const getMyLandlordProfile = async (req: Request, res: Response) => {
   );
 };
 
-export const getAllLandlords = async (_req: Request, res: Response) => {
-  const landlords = await getAllLandlordsService();
+export const getAllLandlords = async (req: Request, res: Response) => {
+  const query = parseLandlordQuery(req);
+  const landlords = await getAllLandlordsService(query);
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Landlords retrieved successfully",
@@ -92,8 +94,9 @@ export const getAllLandlords = async (_req: Request, res: Response) => {
   );
 };
 
-export const getAllLandlordApplications = async (_req: Request, res: Response) => {
-  const applications = await getAllLandlordApplicationsService();
+export const getAllLandlordApplications = async (req: Request, res: Response) => {
+  const query = parseLandlordQuery(req);
+  const applications = await getAllLandlordApplicationsService(query);
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Landlord applications retrieved successfully",
@@ -103,8 +106,9 @@ export const getAllLandlordApplications = async (_req: Request, res: Response) =
   );
 };
 
-export const getAllApprovedLandlords = async (_req: Request, res: Response) => {
-  const approvedLandlords = await getAllApprovedLandlordsService();
+export const getAllApprovedLandlords = async (req: Request, res: Response) => {
+  const query = parseLandlordQuery(req);
+  const approvedLandlords = await getAllApprovedLandlordsService(query);
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Approved landlords retrieved successfully",
@@ -114,8 +118,9 @@ export const getAllApprovedLandlords = async (_req: Request, res: Response) => {
   );
 };
 
-export const getAllRejectedLandlords = async (_req: Request, res: Response) => {
-  const rejectedLandlords = await getAllRejectedLandlordsService();
+export const getAllRejectedLandlords = async (req: Request, res: Response) => {
+  const query = parseLandlordQuery(req);
+  const rejectedLandlords = await getAllRejectedLandlordsService(query);
   res.status(HttpCodes.OK).json(
     successResponse({
       message: "Rejected landlords retrieved successfully",
@@ -155,6 +160,7 @@ export const deleteLandlord = async (req: Request<Params>, res: Response) => {
 
   user.landlordProfile.isActiveLandlord = false;
   user.landlordProfile.deactivatedAt = new Date();
+  user.save();
 
   res.status(HttpCodes.OK).json(
     successResponse({

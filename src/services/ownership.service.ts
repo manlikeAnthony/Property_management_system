@@ -5,11 +5,12 @@ import { AppCodes } from "../errors/AppCodes";
 import mongoose from "mongoose";
 import Property from "../models/property.model";
 import Transaction from "../models/transaction.model";
+import { checkPermissions } from "../utils/checkPermission";
 
 export const purchasePropertyService = async (
   propertyId: string,
   buyerId: string,
-): Promise<void> => {
+) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -36,6 +37,14 @@ export const purchasePropertyService = async (
         HttpCodes.BAD_REQUEST,
         AppCodes.OWNERSHIP_TRANSFER_NOT_ALLOWED,
         "Property is not available for purchase",
+      );
+    }
+
+    if (property.owner.toString() === buyerId) {
+      CustomError.throwError(
+        HttpCodes.BAD_REQUEST,
+        AppCodes.OWNERSHIP_TRANSFER_NOT_ALLOWED,
+        "Buyer cannot purchase their own property",
       );
     }
 
@@ -76,7 +85,7 @@ export const purchasePropertyService = async (
     await session.commitTransaction();
     session.endSession();
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     session.endSession();
     throw error;
   }
@@ -113,6 +122,7 @@ export const initializeOwnershipService = async (
 export const transferOwnershipCore = async (
   propertyId: string,
   newOwnerId: string,
+  requestUser: any,
   session?: any,
 ): Promise<void> => {
   const currentOwnership = await Ownership.findOne({
@@ -127,6 +137,8 @@ export const transferOwnershipCore = async (
       "No active Ownership found",
     );
   }
+
+  checkPermissions(requestUser, currentOwnership.owner);
 
   currentOwnership.disposedAt = new Date();
   await currentOwnership.save({ session });
@@ -152,11 +164,12 @@ export const transferOwnershipCore = async (
 export const transferOwnershipService = async (
   propertyId: string,
   newOwnerId: string,
+  requestUser: any,
 ): Promise<void> => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    await transferOwnershipCore(propertyId, newOwnerId, session);
+    await transferOwnershipCore(propertyId, newOwnerId, requestUser, session);
 
     await session.commitTransaction();
     session.endSession();
@@ -167,21 +180,48 @@ export const transferOwnershipService = async (
   }
 };
 
-export const getOwnershipHistoryService = async (propertyId: string) => {
-  const ownershipHistory = await Ownership.find({ property: propertyId })
+
+export const getOwnershipHistoryService = async (
+  propertyId: string,
+  requestUser: any,
+) => {
+  const currentOwner = await Ownership.findOne({
+    property: propertyId,
+    disposedAt: null,
+  });
+
+  if (!requestUser.roles.includes("ADMIN")) {
+    if (!currentOwner) {
+      CustomError.throwError(
+        HttpCodes.FORBIDDEN,
+        AppCodes.AUTH_UNAUTHORIZED,
+        "No active ownership — access denied",
+      );
+    }
+
+    checkPermissions(requestUser, currentOwner.owner);
+  }
+
+  const ownershipHistory = await Ownership.find({
+    property: propertyId,
+  })
     .sort({ acquiredAt: -1 })
     .populate({ path: "owner", select: "name email" });
+
+  if (ownershipHistory.length === 0) {
+    CustomError.throwError(
+      HttpCodes.NOT_FOUND,
+      AppCodes.OWNERSHIP_NOT_FOUND,
+      "No ownership history found for this property",
+    );
+  }
+
   return ownershipHistory;
 };
-
 export const getCurrentOwnerService = async (propertyId: string) => {
   return Ownership.findOne({ property: propertyId, disposedAt: null }).populate(
     { path: "owner", select: "name email" },
   );
-};
-
-export const getActiveOwnership = async (propertyId: string) => {
-  return Ownership.findOne({ property: propertyId, disposedAt: null });
 };
 
 export const assertSingleActiveOwnership = async (propertyId: string) => {
@@ -197,4 +237,42 @@ export const assertSingleActiveOwnership = async (propertyId: string) => {
     );
   }
   return activeOwnerships[0] || null;
+};
+
+export const getOwnershipByIdService = async (ownershipId: string) => {
+  const ownership = await Ownership.findById(ownershipId).populate({
+    path: "owner",
+    select: "name email",
+  });
+  return ownership;
+};
+
+export const deleteOwnershipService = async (
+  ownershipId: string,
+  requestUser: any,
+) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const ownership = await Ownership.findById(ownershipId).session(session);
+
+    if (!ownership) {
+      CustomError.throwError(
+        HttpCodes.NOT_FOUND,
+        AppCodes.OWNERSHIP_NOT_FOUND,
+        "Ownership record not found",
+      );
+    }
+
+    checkPermissions(requestUser, ownership.owner);
+
+    ownership.disposedAt = new Date();
+    await ownership.save({ session });
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };

@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import Property from "../models/property.model";
 import Ownership from "../models/ownership.model";
+import Tenancy from "../models/tenancy.model";
 import { CustomError } from "../errors/CustomError";
 import { HttpCodes } from "../errors/HttpCodes";
 import { AppCodes } from "../errors/AppCodes";
 import User from "../models/user.model";
 import { S3StorageService } from "./s3.service";
-import type { PropertyType } from "../models/property.model";
+import { getActiveTenancyFilter } from "../utils/tenancy.utils";
 import {
   UpdatePropertyDTO,
   CreatePropertyWithImagesDTO,
@@ -14,6 +15,7 @@ import {
 import { PropertyQuery } from "../query/property/propertyQuery";
 import { geocodeAddress } from "../utils/geocoder";
 import { initializeOwnershipService } from "./ownership.service";
+import { checkPermissions } from "../utils";
 
 export const createPropertyService = async (
   data: CreatePropertyWithImagesDTO,
@@ -185,33 +187,67 @@ export const getPropertyByIdService = async (propertyId: string) => {
 };
 
 export const deletePropertyService = async (propertyId: string, user: any) => {
-  const property = await Property.findById(propertyId);
-  if (!property) {
-    CustomError.throwError(
-      HttpCodes.NOT_FOUND,
-      AppCodes.PROPERTY_NOT_FOUND,
-      "Property not found",
-    );
-  }
-  if (
-    property.owner.toString() !== user.userId &&
-    !user.roles.includes("ADMIN")
-  ) {
-    CustomError.throwError(
-      HttpCodes.FORBIDDEN,
-      AppCodes.AUTH_UNAUTHORIZED,
-      "Not authorized to delete this property",
-    );
-  }
-  const storageService = new S3StorageService();
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (property.images && property.images.length > 0) {
-    await Promise.all(
-      property.images.map((image) => storageService.delete(image.url)),
-    );
+  try {
+    const property = await Property.findById(propertyId).session(session);
+    if (!property) {
+      CustomError.throwError(
+        HttpCodes.NOT_FOUND,
+        AppCodes.PROPERTY_NOT_FOUND,
+        "Property not found",
+      );
+    }
+    if (
+      property.owner.toString() !== user.userId &&
+      !user.roles.includes("ADMIN")
+    ) {
+      CustomError.throwError(
+        HttpCodes.FORBIDDEN,
+        AppCodes.AUTH_UNAUTHORIZED,
+        "Not authorized to delete this property",
+      );
+    }
+
+    const tenancies = await Tenancy.find({
+      property: propertyId,
+      ...getActiveTenancyFilter(),
+    }).session(session);
+
+    if (tenancies.length > 0) {
+      CustomError.throwError(
+        HttpCodes.BAD_REQUEST,
+        AppCodes.PROPERTY_DELETE_NOT_ALLOWED,
+        "Cannot delete property with active tenancies",
+      );
+    }
+    const storageService = new S3StorageService();
+
+    if (property.images && property.images.length > 0) {
+      await Promise.all(
+        property.images.map((image) => storageService.delete(image.url)),
+      );
+    }
+
+    const ownerships = await Ownership.find({
+      property: propertyId,
+      disposedAt: null,
+    }).session(session);
+    for (const ownership of ownerships) {
+      ownership.disposedAt = new Date();
+      await ownership.save({ session });
+    }
+
+    await property.deleteOne({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-  await property.deleteOne();
-  return;
 };
 
 export const updatePropertyService = async (
@@ -229,16 +265,7 @@ export const updatePropertyService = async (
     );
   }
 
-  if (
-    property.owner.toString() !== user.userId &&
-    !user.roles.includes("ADMIN")
-  ) {
-    CustomError.throwError(
-      HttpCodes.FORBIDDEN,
-      AppCodes.AUTH_UNAUTHORIZED,
-      "Not authorized to update this property",
-    );
-  }
+checkPermissions(user, property.owner);
 
   const imagesToRemove = data.imagesToRemove || [];
 
@@ -298,4 +325,3 @@ export const getMyListedPropertiesService = async (userId: string) => {
   const properties = await Property.find({ owner: userId });
   return properties;
 };
-

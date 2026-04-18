@@ -4,13 +4,15 @@ import { CustomError } from "../errors/CustomError";
 import { HttpCodes } from "../errors/HttpCodes";
 import { AppCodes } from "../errors/AppCodes";
 import mongoose from "mongoose";
+import { getActiveTenancyFilter } from "../utils/tenancy.utils";
+import { computePropertyStatus } from "../utils/property.utils";
 
 export const createTenancyService = async (
   propertyId: string,
   tenantId: string,
   startDate: Date,
   endDate?: Date,
-): Promise<void> => {
+) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -49,8 +51,7 @@ export const createTenancyService = async (
 
     const activeTenanciesCount = await Tenancy.countDocuments({
       property: propertyId,
-      status: "ACTIVE",
-      endDate: { $gt: new Date() }, // Count only active tenancies
+      ...getActiveTenancyFilter(),
     }).session(session);
 
     if (activeTenanciesCount >= property.maxTenants) {
@@ -75,7 +76,7 @@ export const createTenancyService = async (
       );
     }
 
-    await Tenancy.create(
+    const tenancy = await Tenancy.create(
       [
         {
           property: propertyId,
@@ -89,19 +90,18 @@ export const createTenancyService = async (
       ],
       { session },
     );
-    const newTenantCount = activeTenanciesCount + 1;
-
-    const newStatus =
-      newTenantCount >= property.maxTenants ? "RENTED" : "AVAILABLE";
+    const status = await computePropertyStatus(propertyId, session);
 
     await Property.findByIdAndUpdate(
       propertyId,
-      { status: newStatus },
+      { status: status },
       { session },
     );
 
     await session.commitTransaction();
     session.endSession();
+    return tenancy;
+
   } catch (error) {
     session.abortTransaction();
     session.endSession();
@@ -111,30 +111,60 @@ export const createTenancyService = async (
 
 export const terminateTenancyService = async (
   tenancyId: string,
+  requestUser: any,
 ): Promise<void> => {
-  const tenancy = await Tenancy.findById(tenancyId);
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (!tenancy) {
-    CustomError.throwError(
-      HttpCodes.NOT_FOUND,
-      AppCodes.RESOURCE_NOT_FOUND,
-      "Tenancy not found",
+  try {
+    const tenancy = await Tenancy.findById(tenancyId).session(session);
+    if (!tenancy) {
+      CustomError.throwError(
+        HttpCodes.NOT_FOUND,
+        AppCodes.RESOURCE_NOT_FOUND,
+        "Tenancy not found",
+      );
+    }
+    
+    if (
+      requestUser.userId !== tenancy.landlord.toString() &&
+      requestUser.userId !== tenancy.tenant.toString() &&
+      !requestUser.roles.includes("ADMIN")
+    ) {
+      CustomError.throwError(
+        HttpCodes.UNAUTHORIZED,
+        AppCodes.AUTH_UNAUTHORIZED,
+        "Not authorized to terminate this tenancy",
+      );
+    }
+    
+    if (tenancy.status !== "ACTIVE") {
+      CustomError.throwError(
+        HttpCodes.BAD_REQUEST,
+        AppCodes.TENANCY_CREATION_NOT_ALLOWED,
+        "Tenancy is not active and cannot be terminated",
+      );
+    }
+
+    tenancy.status = "TERMINATED";
+    tenancy.endDate = new Date();
+    await tenancy.save({ session });
+
+  const status = await computePropertyStatus(tenancy.property.toString(), session);
+
+    await Property.findByIdAndUpdate(
+      tenancy.property,
+      { status: status },
+      { session },
     );
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  if (tenancy.status !== "ACTIVE") {
-    CustomError.throwError(
-      HttpCodes.BAD_REQUEST,
-      AppCodes.TENANCY_CREATION_NOT_ALLOWED,
-      "Tenancy is not active and cannot be terminated",
-    );
-  }
-
-  tenancy.status = "TERMINATED";
-  tenancy.endDate = new Date();
-  await tenancy.save();
-
-  // await Property.findByIdAndUpdate(tenancy.property, { status: "AVAILABLE" });
 };
 
 export const getActiveTenanciesByPropertyService = async (
@@ -142,48 +172,30 @@ export const getActiveTenanciesByPropertyService = async (
 ) => {
   const tenancies = await Tenancy.find({
     property: propertyId,
-    status: "ACTIVE",
-    $or : [
-      { endDate : {$exists: false} },
-      { endDate : {$gt: new Date()} }
-    ]
+    ...getActiveTenancyFilter(),
   }).populate("tenant", "name email");
   return tenancies;
 };
 
-export const getUserTenanciesService = async (
-  userId: string,
-) => {
+export const getUserTenanciesService = async (userId: string) => {
   const tenancies = await Tenancy.find({
     tenant: userId,
-    status: "ACTIVE",
-    $or : [
-      { endDate : {$exists: false} },
-      { endDate : {$gt: new Date()} }
-    ]
+    ...getActiveTenancyFilter(),
   }).populate("property", "title location price");
   return tenancies;
 };
 
-export const getLandlordTenanciesService = async (
-  landlordId: string,
-) => {
+export const getLandlordTenanciesService = async (landlordId: string) => {
   const tenancies = await Tenancy.find({
     landlord: landlordId,
-    status: "ACTIVE",
-    $or : [
-      { endDate : {$exists: false} },
-      { endDate : {$gt: new Date()} }
-    ]
+    ...getActiveTenancyFilter(),
   })
     .populate("property", "title location price")
     .populate("tenant", "name email");
   return tenancies;
 };
 
-export const getTenancyByIdService = async (
-  tenancyId: string,
-)=> {
+export const getTenancyByIdService = async (tenancyId: string) => {
   const tenancy = await Tenancy.findById(tenancyId)
     .populate("property", "title location price")
     .populate("tenant", "name email")

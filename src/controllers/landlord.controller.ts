@@ -146,21 +146,8 @@ export const getSingleLandlord = async (
 };
 
 export const deleteLandlord = async (req: Request<Params>, res: Response) => {
-  const { id: userId } = req.params;
 
-  const user = await deleteLandlordService(userId);
-
-  if (!user.landlordProfile) {
-    CustomError.throwError(
-      HttpCodes.NOT_FOUND,
-      AppCodes.LANDLORD_NOT_FOUND,
-      "Landlord profile not found",
-    );
-  }
-
-  user.landlordProfile.isActiveLandlord = false;
-  user.landlordProfile.deactivatedAt = new Date();
-  user.save();
+  const user = await deleteLandlordService(req.user);
 
   res.status(HttpCodes.OK).json(
     successResponse({

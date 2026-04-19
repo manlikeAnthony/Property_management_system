@@ -212,8 +212,9 @@ export const getSingleLandlordService = async (userId: string) => {
   return landlord;  
 };
 
-export const deleteLandlordService = async (userId: string) => {
-  const user = await User.findById(userId).select("-password");
+export const deleteLandlordService = async (requestUser : any) => {
+
+  const user = await User.findById(requestUser.userId).select("-password");
 
   if (!user) {
     CustomError.throwError(
@@ -230,6 +231,19 @@ export const deleteLandlordService = async (userId: string) => {
       "Landlord not found"
     );
   }
+    if (!user.landlordProfile) {
+      CustomError.throwError(
+        HttpCodes.NOT_FOUND,
+        AppCodes.LANDLORD_NOT_FOUND,
+        "Landlord profile not found",
+      );
+    }
+  
+    checkPermissions(requestUser, user._id);
+    
+    user.landlordProfile.isActiveLandlord = false;
+    user.landlordProfile.deactivatedAt = new Date();
+    user.save();
 
   return user;
 };

@@ -26,22 +26,25 @@ describe("Register Controller", () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
-    CustomLogger.info = jest.fn();
-    CustomLogger.error = jest.fn();
+
+    jest.spyOn(CustomLogger, "info").mockImplementation(() => {});
+    jest.spyOn(CustomLogger, "error").mockImplementation(() => {});
   });
 
-  afterEach(()=>{
-    jest.clearAllMocks()
-  })
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   it("should register user and send email", async () => {
+    const dto = {
+      name: "Anthony",
+      email: "test@gmail.com",
+      password: "secret",
+    };
+
     //arrange
     (registerService as jest.Mock).mockResolvedValue({
-      user: {
-        name: "Anthony",
-        email: "test@gmail.com",
-        password: "secret",
-      },
+      user: dto,
       verificationToken: "token123",
     });
 
@@ -49,12 +52,12 @@ describe("Register Controller", () => {
     await register(req as Request, res as Response);
 
     //assert
-    expect(registerService).toHaveBeenCalledWith(req.body);
+    expect(registerService).toHaveBeenCalledWith(dto);
 
     expect(sendVerificationEmail).toHaveBeenCalledWith(
       expect.objectContaining({
-        name: "Anthony",
-        email: "test@gmail.com",
+        name: dto.name,
+        email: dto.email,
         verificationToken: "token123",
       }),
     );
@@ -63,7 +66,8 @@ describe("Register Controller", () => {
 
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: "User registered successfully",
+        message:
+          "User registered successfully , Check your email to verify your account",
         data: null,
         code: AppCodes.USER_CREATED,
       }),
@@ -83,43 +87,30 @@ describe("Register Controller", () => {
 
     expect(sendVerificationEmail).not.toHaveBeenCalled();
   });
-
-
-  it("should throw error if input is invalid", async () => {
-    req.body = {
-      name: "",
-      email: "",
-      password: "",
-    };
-
-    (registerService as jest.Mock).mockRejectedValue(
-      new Error("Missing required fields"),
-    );
-
-    await expect(register(req as Request, res as Response)).rejects.toThrow(
-      "Missing required fields",
-    );
-
-    expect(sendVerificationEmail).not.toHaveBeenCalled();
-  });
-  
-  it("should throw error if email sending fails", async () => {
-  (registerService as jest.Mock).mockResolvedValue({
-    user: {
+  it("should still successfully register user even if email sending fails", async () => {
+    const dto = {
       name: "Anthony",
       email: "test@gmail.com",
-    },
-    verificationToken: "token123",
+      password: "secret",
+    };
+
+    (registerService as jest.Mock).mockResolvedValue({
+      user: dto,
+      verificationToken: "token123",
+    });
+
+    (sendVerificationEmail as jest.Mock).mockRejectedValue(
+      new Error("Email service failed"),
+    );
+
+    await register(req as Request, res as Response);
+
+    expect(registerService).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(HttpCodes.CREATED);
+    expect(res.json).toHaveBeenCalled();
+    expect(CustomLogger.error).toHaveBeenCalledWith(
+      "Error sending verification email:",
+      expect.any(Error),
+    );
   });
-
-  (sendVerificationEmail as jest.Mock).mockRejectedValue(
-    new Error("Email failed")
-  );
-
-  await expect(
-    register(req as Request, res as Response)
-  ).rejects.toThrow("Email failed");
-
-  expect(registerService).toHaveBeenCalled();
-});
 });

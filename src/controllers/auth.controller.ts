@@ -16,7 +16,7 @@ import {
   forgotPasswordService,
   resetPasswordService,
 } from "../services/auth.service";
-
+import { CustomLogger } from "../logger/CustomLogger";
 import {
   registerDTO,
   loginDTO,
@@ -39,7 +39,7 @@ export const register = async (req: Request, res: Response) => {
     verificationToken: verificationToken,
     origin: "http://localhost:3000",
   }).catch((err) => {
-    console.error("Error sending verification email:", err);
+    CustomLogger.error("Error sending verification email:", err);
   });
 
   res.status(HttpCodes.CREATED).json(

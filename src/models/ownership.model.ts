@@ -4,7 +4,7 @@ export interface OwnershipDocument extends Document {
   property: Types.ObjectId;
   owner: Types.ObjectId;
   acquiredAt: Date;
-  disposedAt?: Date;
+  disposedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,17 +25,18 @@ const OwnershipSchema = new Schema<OwnershipDocument>(
       type: Date,
       default: Date.now,
     },
-    disposedAt: Date,
+    disposedAt: {
+      type : Date ,
+      default : null
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 OwnershipSchema.index(
-  {property: 1, disposedAt: 1},
-  {unique: true, partialFilterExpression: {disposedAt: null}}
-)
-
-
+  { property: 1, disposedAt: 1 },
+  { unique: true, partialFilterExpression: { disposedAt: null } },
+);
 
 export const Ownership = model<OwnershipDocument>("Ownership", OwnershipSchema);
 export default Ownership;

@@ -13,3 +13,17 @@ export interface ResetPasswordEmailParams {
   token: string;
   origin: string;
 }
+
+export interface VerificationEmailJob {
+  name: string;
+  email: string;
+  verificationToken: string;
+  origin: string;
+}
+
+export interface ResetPasswordJob {
+  name: string;
+  email: string;
+  token: string;
+  origin: string;
+}

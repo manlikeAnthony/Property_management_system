@@ -16,6 +16,8 @@ import { PropertyQuery } from "../query/property/propertyQuery";
 import { geocodeAddress } from "../utils/geocoder";
 import { initializeOwnershipService } from "./ownership.service";
 import { checkPermissions } from "../utils";
+import { propertyQueue } from "../queues/property.queue";
+import { PropertyJobs } from "../jobs/property.jobs";
 
 export const createPropertyService = async (
   data: CreatePropertyWithImagesDTO,
@@ -77,13 +79,6 @@ export const createPropertyService = async (
 
   const addressString = `${address.street}, ${address.city}, ${address.state}, ${address.country}`;
 
-  const geo = await geocodeAddress(addressString);
-
-  const location = {
-    type: "Point" as const,
-    coordinates: [geo.lng, geo.lat],
-  };
-
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -92,8 +87,11 @@ export const createPropertyService = async (
       [
         {
           ...data,
-          location,
-          formattedAddress: geo.formattedAddress,
+          location: {
+            type: "Point",
+            coordinates: [0, 0], // temporary placeholder
+          },
+          formattedAddress: "",
           owner: user.userId,
           listedBy: userRecord._id,
           images: images || [],
@@ -109,6 +107,11 @@ export const createPropertyService = async (
       user.userId,
       session,
     );
+    
+    await propertyQueue.add(PropertyJobs.GEOCODE_ADDRESS, {
+      propertyId: property[0]._id.toString(),
+      addressString,
+    });
 
     await session.commitTransaction();
     session.endSession();
@@ -265,7 +268,7 @@ export const updatePropertyService = async (
     );
   }
 
-checkPermissions(user, property.owner);
+  checkPermissions(user, property.owner);
 
   const imagesToRemove = data.imagesToRemove || [];
 

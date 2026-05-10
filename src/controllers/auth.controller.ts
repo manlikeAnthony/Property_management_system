@@ -1,7 +1,4 @@
 import { Request, Response } from "express";
-import crypto from "crypto";
-import User from "../models/user.model";
-import Token, { TokenDocument } from "../models/token.model";
 import { attachCookiesToResponse, createTokenUser } from "../utils";
 import { CustomError } from "../errors/CustomError";
 import { AppCodes } from "../errors/AppCodes";
@@ -27,24 +24,24 @@ import {
 } from "../dto/auth";
 
 import { sendVerificationEmail, sendResetPasswordEmail } from "../utils/email";
+import { emailQueue } from "../queues/email.queue";
 
 export const register = async (req: Request, res: Response) => {
-  const dto : registerDTO = req.body;
+  const dto: registerDTO = req.body;
 
   const { user, verificationToken } = await registerService(dto);
 
-  sendVerificationEmail({
+  await emailQueue.add("send-verification-email", {
     name: user.name,
     email: user.email,
     verificationToken: verificationToken,
-    origin: "http://localhost:3000",
-  }).catch((err) => {
-    CustomLogger.error("Error sending verification email:", err);
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
   });
 
   res.status(HttpCodes.CREATED).json(
     successResponse({
-      message: "User registered successfully , Check your email to verify your account",
+      message:
+        "User registered successfully , Check your email to verify your account",
       data: null,
       code: AppCodes.USER_CREATED,
     }),
@@ -52,8 +49,8 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  const dto :loginDTO = req.body;
-  
+  const dto: loginDTO = req.body;
+
   const { tokenUser, refreshToken } = await loginService(dto, {
     ip: req.ip,
     userAgent: req.headers["user-agent"],
@@ -91,7 +88,7 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
-  const dto : verifyEmailDTO = req.body;
+  const dto: verifyEmailDTO = req.body;
 
   const { token, email } = dto;
   if (!token || !email) {
@@ -112,7 +109,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 export const resendVerificationEmail = async (req: Request, res: Response) => {
-  const dto : resendVerificationEmailDTO = {
+  const dto: resendVerificationEmailDTO = {
     email: req.body.email,
   };
   if (!dto.email) {
@@ -125,11 +122,17 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
   const user = await resendVerificationEmailService(dto.email);
 
   if (user) {
-    await sendVerificationEmail({
+    await emailQueue.add("send-verification-email", {
       name: user.name,
       email: user.email,
       verificationToken: user.verificationToken,
-      origin: "http://localhost:3000",
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    } , {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 2000, // 2 seconds
+      },
     });
   }
 
@@ -143,7 +146,7 @@ export const resendVerificationEmail = async (req: Request, res: Response) => {
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
-  const dto : forgotPasswordDTO = req.body;
+  const dto: forgotPasswordDTO = req.body;
   const { email } = dto;
   if (!email) {
     CustomError.throwError(
@@ -155,11 +158,17 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
   const user = await forgotPasswordService(email);
   if (user) {
-    await sendResetPasswordEmail({
+    await emailQueue.add("send-reset-password-email", {
       name: user.name,
       email: user.email,
       token: user.passwordToken,
-      origin: "http://localhost:3000",
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    } , {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 2000, // 2 seconds
+      },
     });
   }
   res.status(HttpCodes.OK).json(
@@ -172,7 +181,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-  const dto : resetPasswordDTO = req.body;
+  const dto: resetPasswordDTO = req.body;
   const { email, token, password } = dto;
   if (!email || !token || !password) {
     CustomError.throwError(

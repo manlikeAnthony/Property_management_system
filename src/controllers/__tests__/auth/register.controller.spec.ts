@@ -33,6 +33,7 @@ describe("Register Controller", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it("should register user and send email", async () => {
@@ -54,13 +55,12 @@ describe("Register Controller", () => {
     //assert
     expect(registerService).toHaveBeenCalledWith(dto);
 
-    expect(sendVerificationEmail).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: dto.name,
-        email: dto.email,
-        verificationToken: "token123",
-      }),
-    );
+    expect(sendVerificationEmail).toHaveBeenCalledWith({
+      name: dto.name,
+      email: dto.email,
+      verificationToken: "token123",
+      origin: "http://localhost:3000",
+    });
 
     expect(res.status).toHaveBeenCalledWith(HttpCodes.CREATED);
 
@@ -72,6 +72,7 @@ describe("Register Controller", () => {
         code: AppCodes.USER_CREATED,
       }),
     );
+    expect(res.json).toHaveBeenCalledTimes(1);
   });
 
   it("should propagate error if registerService fails", async () => {
@@ -86,14 +87,19 @@ describe("Register Controller", () => {
     );
 
     expect(sendVerificationEmail).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
   });
+
   it("should still successfully register user even if email sending fails", async () => {
+    //arrange
     const dto = {
       name: "Anthony",
       email: "test@gmail.com",
       password: "secret",
     };
 
+    //act
     (registerService as jest.Mock).mockResolvedValue({
       user: dto,
       verificationToken: "token123",
@@ -105,12 +111,24 @@ describe("Register Controller", () => {
 
     await register(req as Request, res as Response);
 
+    //assert
     expect(registerService).toHaveBeenCalled();
+
     expect(res.status).toHaveBeenCalledWith(HttpCodes.CREATED);
-    expect(res.json).toHaveBeenCalled();
+
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          "User registered successfully , Check your email to verify your account",
+        data: null,
+        code: AppCodes.USER_CREATED,
+      }),
+    );
+
     expect(CustomLogger.error).toHaveBeenCalledWith(
       "Error sending verification email:",
       expect.any(Error),
     );
+    expect(res.json).toHaveBeenCalledTimes(1);
   });
 });

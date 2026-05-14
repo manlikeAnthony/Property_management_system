@@ -1,0 +1,1 @@
+import{j as r}from"./index-C4VJ_dyH.js";import{S as s}from"./site-layout-D6f7Iyst.js";const o=({children:t})=>r.jsx(s,{children:r.jsx("div",{className:"mx-auto grid min-h-[calc(100vh-8rem)] max-w-6xl items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]",children:t})});export{o as A};

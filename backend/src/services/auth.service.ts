@@ -40,7 +40,7 @@ export const registerService = async (data: {
 
   const isFirstAccount = (await User.countDocuments()) === 0;
 
-  const verificationToken = crypto.randomBytes(40).toString("hex");
+  const verificationToken = crypto.randomInt(100000, 1000000).toString();
 
   const user = await User.create({
     name,
@@ -183,7 +183,9 @@ export const resendVerificationEmailService = async (
     CustomLogger.info(
       "resendVerificationEmailService",
       AppCodes.RESEND_VERIFICATION_EMAIL_NON_EXISTENT_EMAIL,
-      { message: `Resend verification email requested for non-existent email: ${email}` },
+      {
+        message: `Resend verification email requested for non-existent email: ${email}`,
+      },
     );
     return undefined; // Don't reveal that the email doesn't exist
   }
@@ -192,7 +194,9 @@ export const resendVerificationEmailService = async (
     CustomLogger.info(
       "resendVerificationEmailService",
       AppCodes.USER_ALREADY_VERIFIED,
-      { message: `Resend verification email requested for already verified email: ${email}` },
+      {
+        message: `Resend verification email requested for already verified email: ${email}`,
+      },
     );
     CustomError.throwError(
       HttpCodes.CONFLICT,

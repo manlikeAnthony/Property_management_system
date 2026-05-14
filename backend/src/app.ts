@@ -1,9 +1,10 @@
-
 import express , {Request , Response} from 'express'
+import cors from "cors";
 import { notFound } from "./middlewares/not-found";
 import { errorHandlerMiddleware } from "./middlewares/error-handler"; 
 import cookieParser from "cookie-parser";
 import morgan from 'morgan'
+
 // Routes
 import authRouter from "./routes/auth.route";
 import userRouter from './routes/user.route';
@@ -13,6 +14,14 @@ import ownershipRouter from './routes/ownership.route'
 
 const app = express();
 
+// CORS
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || process.env.FRONTEND_URL_DOCKER,
+    credentials: true,
+  })
+);
+
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
@@ -21,6 +30,7 @@ app.use(morgan("dev"))
 app.get('/api/v1' , (_req:Request , res:Response)=>{
     res.send('Property Management System')
 })
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/landlord", landlordRouter);

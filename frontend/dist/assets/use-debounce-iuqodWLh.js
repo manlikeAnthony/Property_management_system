@@ -1,0 +1,1 @@
+import{r as o}from"./index-C4VJ_dyH.js";const c=(e,t=350)=>{const[r,s]=o.useState(e);return o.useEffect(()=>{const u=window.setTimeout(()=>s(e),t);return()=>window.clearTimeout(u)},[e,t]),r};export{c as u};

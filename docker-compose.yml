@@ -1,0 +1,53 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: property-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - redis
+    networks:
+      - property-network
+  
+  worker:
+    build:
+      context: ./backend
+    container_name: property-worker
+    restart: unless-stopped
+    command: npm run worker
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - redis
+    networks:
+      - property-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: property-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+    networks:
+      - property-network
+    
+  redis:
+    image: redis:7-alpine
+    container_name: property-redis
+    restart: unless-stopped
+    networks:
+      - property-network
+
+networks:
+  property-network:
+    driver: bridge

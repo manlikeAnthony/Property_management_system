@@ -5,7 +5,10 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon --watch src --ext ts --exec \"ts-node -r tsconfig-paths/register --files src/server.ts\"",
-    "start": "node src/server.ts"
+    "start": "node dist/server.js",
+    "worker": "node dist/workers/index.js",
+    "worker:dev": "ts-node src/workers/index.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +16,7 @@
   "description": "",
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/jest": "^30.0.0",
     "@types/joi": "^17.2.2",
     "@types/jsonwebtoken": "^9.0.10",

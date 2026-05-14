@@ -1,0 +1,1 @@
+const t=r=>r?Array.isArray(r)?r:r.docs??r.data??r.items??r.results??[]:[];export{t as n};
